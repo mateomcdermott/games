@@ -188,7 +188,7 @@
 
         .three-man-banner {
             color: #FF0000;
-            font-size: 1.4rem;
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
             margin-bottom: 12px;
             text-shadow: 3px 3px 0px #FFFFFF;
             line-height: 1.4;
@@ -196,7 +196,7 @@
         }
 
         .turn-indicator {
-            font-size: 1.1rem;
+            font-size: clamp(1.1rem, 4vw, 1.8rem);
             color: #FFFFFF;
             letter-spacing: 0.05em;
         }
@@ -537,45 +537,40 @@
             transition: transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        #spin-wheel::before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #FF0000;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-
-        #spin-wheel::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 25px solid #FF0000;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-
         .wheel-pointer-bottom {
             position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: -58px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 54px;
+            height: 54px;
+            z-index: 10;
+        }
+
+        .wheel-pointer-bottom::before {
+            content: '';
+            position: absolute;
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 25px solid #FF0000;
-            z-index: 10;
+            border-top: 27px solid transparent;
+            border-bottom: 27px solid transparent;
+            border-right: 50px solid #FFFFFF;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+        }
+
+        .wheel-pointer-bottom::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 23px solid transparent;
+            border-bottom: 23px solid transparent;
+            border-right: 44px solid #FF0000;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
         }
 
         .spin-btn {
@@ -606,11 +601,102 @@
 
         .wheel-result {
             color: #FF0000;
-            font-size: clamp(1.4rem, 6.5vw, 2.4rem);
+            font-size: clamp(1.8rem, 9vw, 3.5rem);
             text-align: center;
             text-shadow: 3px 3px 0px #FFFFFF;
             min-height: 2em;
             line-height: 1.5;
+        }
+
+        /* SETTINGS HAMBURGER */
+        .hud-top {
+            position: relative;
+        }
+
+        .hamburger-btn {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            background: none;
+            border: 2px solid #555;
+            color: #FFFFFF;
+            font-size: 1.4rem;
+            padding: 6px 10px;
+            line-height: 1;
+            cursor: pointer;
+            font-family: monospace;
+        }
+
+        .hamburger-btn:active {
+            border-color: #FF0000;
+            color: #FF0000;
+        }
+
+        /* SETTINGS OVERLAY */
+        #settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.97);
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        #settings-overlay.active {
+            display: flex;
+        }
+
+        #settings-overlay h2 {
+            color: #FF0000;
+            font-size: 1.5rem;
+            margin: 0 0 24px 0;
+            text-shadow: 2px 2px 0px #FFFFFF;
+        }
+
+        .settings-menu-btn {
+            width: 90%;
+            max-width: 400px;
+            padding: 18px 20px;
+            background-color: #000000;
+            color: #FFFFFF;
+            border: 4px solid #FF0000;
+            font-size: 1rem;
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .settings-menu-btn:active {
+            background-color: #FF0000;
+            color: #FFFFFF;
+        }
+
+        .settings-close-btn {
+            width: 90%;
+            max-width: 400px;
+            padding: 14px 20px;
+            background-color: #111;
+            color: #888;
+            border: 3px solid #444;
+            font-size: 0.8rem;
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .settings-close-btn:active {
+            background-color: #333;
+            color: #FFFFFF;
         }
 
     </style>
@@ -625,7 +711,7 @@
         <h1>THREE<br>MAN</h1>
         <p class="subtitle">A DICE & DRINK GAME</p>
         <div class="container">
-            <input type="text" id="playerName" placeholder="ENTER NAME" autocomplete="off">
+            <input type="text" id="playerName" placeholder="ENTER NAME" autocomplete="off" maxlength="7">
             <div class="input-error" id="playerError"></div>
             <button class="add-btn" id="addPlayerBtn">ADD PLAYER</button>
             <ul class="player-list" id="playerList"></ul>
@@ -639,8 +725,11 @@
             <h2>GAME RULES</h2>
             
             <h3>THREE MAN TITLE</h3>
-            <p>If you roll a 3 on ANY die (2+1, 3+1, 3+any, etc), you become the Three Man.</p>
-            <p>Only the Three Man can pass the title by rolling a 3 again. They choose who gets it next.</p>
+            <p>The Three Man is decided at the start of the game by the spinner wheel.</p>
+            <p>If anyone (who is NOT the Three Man) rolls a 3 on any die, the Three Man takes a sip. The roller then rolls again.</p>
+            <p>If the roller gets doubles that include a 3 (e.g. 3+3), the Three Man takes TWO sips.</p>
+            <p>The Three Man title only switches when the Three Man themselves rolls a 3. They choose who gets the title next.</p>
+            <p>If the Three Man rolls double 3s, they FIRST pass the title, THEN choose how to distribute the dice (Option 1 or 2).</p>
 
             <h3>DOUBLES</h3>
             <p>Roll the same number twice? You have two options:</p>
@@ -687,6 +776,7 @@
             <div class="hud-top">
                 <div class="three-man-banner" id="hud-threeman">THREE MAN: NONE</div>
                 <div class="turn-indicator" id="hud-turn">ROLLER: ---</div>
+                <button class="hamburger-btn" id="settingsBtn">&#9776;</button>
             </div>
             <div class="hud-bottom">
                 <button class="roll-btn" id="rollBtn">ROLL DICE</button>
@@ -713,6 +803,13 @@
             <div class="timer-display" id="timer-seconds">0</div>
             <div class="timer-instruction">DRINK FOR THE SECONDS!</div>
         </div>
+    </div>
+
+    <div id="settings-overlay">
+        <h2>SETTINGS</h2>
+        <button class="settings-menu-btn" id="settingsRulesBtn">VIEW RULES</button>
+        <button class="settings-menu-btn" id="settingsExitBtn">EXIT TO MENU</button>
+        <button class="settings-close-btn" id="settingsCloseBtn">CLOSE</button>
     </div>
 
 
@@ -757,6 +854,7 @@
         function addPlayer() {
             const name = nameInput.value.trim().toUpperCase();
             if (name === "") return showError("ENTER A NAME FIRST.");
+            if (name.length > 7) return showError("MAX 7 CHARACTERS!");
             if (players.includes(name)) return showError(`${name} IS ALREADY ADDED!`);
 
             players.push(name);
@@ -908,18 +1006,18 @@
             // Get current rotation
             const currentRotation = parseFloat(wheel.style.transform.replace('rotate(', '').replace('deg)', '')) || 0;
             
-            // Calculate target rotation to align winning player to the top
-            // We need to rotate so the winning player's segment is at the top (90 degrees in the SVG coordinate system)
-            const targetSegmentPosition = 90;
-            const winningSegmentStartAngle = winningPlayerIndex * segmentAngle - 90;
-            const winningSegmentMidAngle = winningSegmentStartAngle + (segmentAngle / 2);
-            
-            // Calculate how many degrees to rotate
-            const degreesToRotate = targetSegmentPosition - winningSegmentMidAngle;
-            
-            // Add multiple full spins
-            const fullSpins = 5 * 360;
-            const finalRotation = currentRotation + fullSpins + degreesToRotate;
+            // The right-side pointer is at 0° in SVG-Y convention (right = 0°).
+            // Segments are drawn with index 0 starting at -90° (top), going clockwise.
+            // After CSS rotate(R deg), a segment originally at angle θ appears at θ + R.
+            // We need: winningSegmentMidAngle + finalRotation ≡ 0 (mod 360)
+            // → finalRotation ≡ -winningSegmentMidAngle (mod 360)
+            const targetSegmentPosition = 0;
+            const winningSegmentMidAngle = winningPlayerIndex * segmentAngle - 90 + (segmentAngle / 2);
+            const targetRotation = ((-winningSegmentMidAngle) % 360 + 360) % 360;
+
+            // Spin forward at least 5 full rotations past the current position
+            const fullSpinsNeeded = Math.ceil((currentRotation - targetRotation) / 360) + 5;
+            const finalRotation = targetRotation + fullSpinsNeeded * 360;
 
             wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             wheel.style.transform = `rotate(${finalRotation}deg)`;
@@ -1117,15 +1215,43 @@
             const isThreeRolled = (die1 === 3 || die2 === 3);
             const isDoubles = (die1 === die2);
 
-            // RULE 4: Action Rolls — handle doubles first so Three Man state isn't
-            // mutated before the doubles UI resolves (e.g. rolling 3+3)
+            // RULE 4: Action Rolls — handle doubles first
             if (isDoubles) {
                 passTurn = false;
                 const doublesNextRoller = (currentPlayerIndex + 1) % players.length;
-                // If a 3 is involved, queue the Three Man effect to fire after doubles resolve
-                if (isThreeRolled) {
-                    doublesRollData.pendingThreeManRoller = rollerName;
-                    doublesRollData.pendingThreeManIsCurrentThreeMan = (currentThreeMan === rollerName);
+
+                if (isThreeRolled && currentThreeMan === rollerName) {
+                    // Three Man rolled 3+3 — title-pass happens FIRST, then doubles distribution
+                    doublesRollData = { diceValue: die1, rollerName, nextRoller: doublesNextRoller };
+                    doublesRollData.pendingThreeManRoller = null;
+                    document.getElementById('prompt-title').textContent = `ROLLED ${sum}`;
+                    document.getElementById('prompt-desc').innerHTML = `DOUBLE 3S! FIRST, PASS THE THREE MAN TITLE. THEN DISTRIBUTE THE DICE.`;
+                    document.getElementById('dismissBtn').style.display = 'none';
+                    document.getElementById('dice-distribution').style.display = 'none';
+                    const selectList = document.getElementById('player-select-list');
+                    selectList.style.display = 'flex';
+                    selectList.innerHTML = '';
+                    players.forEach(p => {
+                        if (p !== rollerName) {
+                            const btn = document.createElement('button');
+                            btn.className = 'select-btn';
+                            btn.textContent = `GIVE TO ${p}`;
+                            btn.onclick = () => {
+                                currentThreeMan = p;
+                                updateHUD();
+                                selectList.style.display = 'none';
+                                // Now show doubles distribution
+                                showDoublesDistribution(die1, rollerName, doublesNextRoller);
+                            };
+                            selectList.appendChild(btn);
+                        }
+                    });
+                    setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
+                    return;
+                } else if (isThreeRolled && currentThreeMan) {
+                    // Non-Three Man rolled 3+3 — Three Man drinks two sips
+                    prompts.push(`${rollerName} ROLLED DOUBLES WITH A 3! ${currentThreeMan} (THREE MAN) TAKES TWO SIPS!`);
+                    doublesRollData.pendingThreeManRoller = null;
                 } else {
                     doublesRollData.pendingThreeManRoller = null;
                 }
@@ -1133,18 +1259,22 @@
                 document.getElementById('prompt-title').textContent = `ROLLED ${sum}`;
                 document.getElementById('prompt-desc').innerHTML = prompts.join('<br><br>');
                 showDoublesDistribution(die1, rollerName, doublesNextRoller);
-                return; // Exit early to show distribution options
+                return;
             }
 
-            // RULE 1: If you're the Three Man and roll a 3 (non-doubles), you pass it
+            // RULE 1: If you're the Three Man and roll a 3 (non-doubles), you pass the title
             if (currentThreeMan === rollerName && isThreeRolled) {
                 prompts.push(`YOU ROLLED A 3! PASS THE TITLE!`);
                 showThreeManSelection = true;
             }
-            // RULE 2: If you roll a 3 (non-doubles), you become the new Three Man
+            // RULE 2: If someone else rolls a 3, the Three Man drinks and the roller goes again
+            else if (isThreeRolled && currentThreeMan) {
+                passTurn = false;
+                prompts.push(`${rollerName} ROLLED A 3! ${currentThreeMan} (THREE MAN) TAKES A SIP!`);
+            }
+            // RULE 2b: If no Three Man yet and someone rolls a 3, nothing special
             else if (isThreeRolled) {
-                currentThreeMan = rollerName;
-                prompts.push(`${rollerName} IS THE NEW THREE MAN!`);
+                prompts.push(`${rollerName} ROLLED A 3! NO THREE MAN YET.`);
             }
 
             if (sum === 7) {
@@ -1528,6 +1658,29 @@
             // Clear player list UI
             document.getElementById('playerList').innerHTML = '';
             document.getElementById('playerName').value = '';
+        });
+
+        // ==========================================
+        // SETTINGS MENU
+        // ==========================================
+        const settingsOverlay = document.getElementById('settings-overlay');
+
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            settingsOverlay.classList.add('active');
+        });
+
+        document.getElementById('settingsCloseBtn').addEventListener('click', () => {
+            settingsOverlay.classList.remove('active');
+        });
+
+        document.getElementById('settingsRulesBtn').addEventListener('click', () => {
+            settingsOverlay.classList.remove('active');
+            document.getElementById('rules-modal').classList.add('active');
+        });
+
+        document.getElementById('settingsExitBtn').addEventListener('click', () => {
+            settingsOverlay.classList.remove('active');
+            document.getElementById('exitToMenuBtn').click();
         });
 
         window.addEventListener('resize', () => {
