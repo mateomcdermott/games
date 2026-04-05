@@ -1468,23 +1468,14 @@
             currentThreeMan = newPlayerName;
             document.getElementById('action-prompt').classList.remove('active');
 
-            // Fire the flash animation for the victim
-            const flash = document.getElementById('three-animation-layer');
-            document.getElementById('flash-text').textContent = `${newPlayerName} IS THE NEW THREE MAN!`;
-            flash.classList.add('flash');
+            // Advance turn logic immediately without flash animation
+            currentPlayerIndex = nextRoller;
+            updateHUD();
 
-            setTimeout(() => {
-                flash.classList.remove('flash');
-
-                // Advance turn logic
-                currentPlayerIndex = nextRoller;
-                updateHUD();
-
-                // Unlock board
-                isRolling = false;
-                document.getElementById('rollBtn').disabled = false;
-                document.getElementById('rollBtn').textContent = "ROLL DICE";
-            }, 2000);
+            // Unlock board
+            isRolling = false;
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('rollBtn').textContent = "ROLL DICE";
         }
 
         // Standard Dismiss Prompt & Next Turn
