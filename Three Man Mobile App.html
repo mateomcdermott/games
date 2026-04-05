@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THREE MAN</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        /* --- GLOBAL STYLES --- */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: 'Press Start 2P', monospace;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        button {
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-sizing: border-box;
+        }
+
+        /* --- LANDING PAGE --- */
+        #landing-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            position: relative;
+            z-index: 100;
+            background: #000;
+        }
+
+        h1 {
+            color: #FF0000;
+            font-size: 3rem;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            text-shadow: 4px 4px 0px #FFFFFF;
+            text-align: center;
+        }
+
+        p.subtitle {
+            font-size: 0.8rem;
+            margin-bottom: 40px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            padding-bottom: 80px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #FFFFFF;
+            border: 4px solid #FF0000;
+            color: #000000;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border: 4px solid #FFFFFF;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .add-btn:active {
+            background-color: #FFFFFF;
+            color: #FF0000;
+            border-color: #FF0000;
+        }
+
+        .player-list {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .player-list li {
+            background-color: #000000;
+            color: #FFFFFF;
+            padding: 15px 10px;
+            margin-bottom: 10px;
+            border-left: 6px solid #FF0000;
+            border-bottom: 2px dashed #333333;
+            font-size: 0.9rem;
+        }
+
+        .start-btn {
+            background-color: #FFFFFF;
+            color: #000000;
+            border: 4px solid #FF0000;
+            font-size: 1.2rem;
+            margin-top: 0;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .start-btn:active {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        /* --- GAME SCREEN --- */
+        #game-screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hud-top {
+            background-color: #000000;
+            border-bottom: 4px solid #FF0000;
+            padding: 15px;
+            text-align: center;
+            pointer-events: auto;
+        }
+
+        .three-man-banner {
+            color: #FF0000;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px #FFFFFF;
+            line-height: 1.5;
+        }
+
+        .turn-indicator {
+            font-size: 0.8rem;
+            color: #FFFFFF;
+        }
+
+        .hud-bottom {
+            padding: 20px;
+            pointer-events: auto;
+        }
+
+        .roll-btn {
+            width: 100%;
+            padding: 20px;
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border: 4px solid #FFFFFF;
+            font-size: 1.2rem;
+            box-shadow: 0px 6px 0px #FFFFFF;
+        }
+
+        .roll-btn:active {
+            box-shadow: 0px 0px 0px #FFFFFF;
+            transform: translateY(6px);
+        }
+
+        .roll-btn:disabled {
+            background-color: #555;
+            border-color: #333;
+            box-shadow: none;
+            transform: translateY(6px);
+            cursor: not-allowed;
+            color: #888;
+        }
+
+        /* ACTION PROMPT POPUP */
+        #action-prompt {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background-color: #FFFFFF;
+            color: #000000;
+            border-top: 8px solid #FF0000;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            text-align: center;
+            z-index: 20;
+            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #action-prompt.active {
+            bottom: 0;
+        }
+
+        #action-prompt h2 {
+            color: #FF0000;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        #action-prompt p {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .dismiss-btn {
+            background-color: #000000;
+            color: #FFFFFF;
+            border: 4px solid #FF0000;
+            padding: 15px 20px;
+            width: 100%;
+        }
+
+        .dismiss-btn:active {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border-color: #000000;
+        }
+
+        /* DYNAMIC PLAYER SELECTION BUTTONS */
+        #player-select-list {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .select-btn {
+            background-color: #000000;
+            color: #FFFFFF;
+            border: 4px solid #FF0000;
+            padding: 15px;
+            width: 100%;
+        }
+
+        .select-btn:active {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border-color: #000000;
+        }
+
+        /* GIANT '3' ANIMATION */
+        #three-animation-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #FFFFFF;
+            color: #FF0000;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease-in-out;
+        }
+
+        #three-animation-layer.flash {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .giant-three {
+            font-size: 12rem;
+            text-shadow: 10px 10px 0px #000000;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .new-three-man-text {
+            font-size: 1.2rem;
+            color: #000000;
+            margin-top: 20px;
+            text-align: center;
+            padding: 0 20px;
+            line-height: 1.5;
+        }
+
+        /* RULES BUTTON */
+        .rules-btn {
+            background-color: #FFFFFF;
+            color: #000000;
+            border: 4px solid #FF0000;
+            font-size: 0.9rem;
+            padding: 12px 20px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .rules-btn:active {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        /* RULES MODAL */
+        #rules-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        #rules-modal.active {
+            display: flex;
+        }
+
+        .rules-content {
+            background-color: #000000;
+            color: #FFFFFF;
+            border: 4px solid #FF0000;
+            padding: 30px 20px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .rules-content h2 {
+            color: #FF0000;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0px #FFFFFF;
+        }
+
+        .rules-content h3 {
+            color: #FFFFFF;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-bottom: 2px dashed #FF0000;
+            padding-bottom: 5px;
+        }
+
+        .rules-content p {
+            font-size: 0.75rem;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .close-rules-btn {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border: 4px solid #FFFFFF;
+            padding: 12px 20px;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .close-rules-btn:active {
+            background-color: #FFFFFF;
+            color: #FF0000;
+            border-color: #FF0000;
+        }
+
+        /* DICE DISTRIBUTION MODAL */
+        #dice-distribution {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .distribution-option {
+            background-color: #000000;
+            color: #FFFFFF;
+            border: 4px solid #FF0000;
+            padding: 15px;
+            width: 100%;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .distribution-option:active {
+            background-color: #FF0000;
+            color: #FFFFFF;
+        }
+
+        /* DRINKING TIMER */
+        #drinking-timer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 150;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        #drinking-timer.active {
+            display: flex;
+        }
+
+        .timer-content {
+            text-align: center;
+            color: #FFFFFF;
+        }
+
+        .timer-player-name {
+            font-size: 1.5rem;
+            color: #FF0000;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0px #FFFFFF;
+        }
+
+        .timer-display {
+            font-size: 8rem;
+            color: #FF0000;
+            font-weight: bold;
+            text-shadow: 5px 5px 0px #FFFFFF;
+            margin: 20px 0;
+            line-height: 1;
+        }
+
+        .timer-instruction {
+            font-size: 1.2rem;
+            color: #FFFFFF;
+            margin-top: 30px;
+        }
+
+        /* SPIN WHEEL SCREEN */
+        #wheel-screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 100;
+        }
+
+        #wheel-screen h2 {
+            color: #FF0000;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 0px #FFFFFF;
+            text-align: center;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #spin-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #FF0000;
+            transition: transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        #spin-wheel::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #FF0000;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        #spin-wheel::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid #FF0000;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .wheel-pointer-bottom {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid #FF0000;
+            z-index: 10;
+        }
+
+        .spin-btn {
+            background-color: #FFFFFF;
+            color: #000000;
+            border: 4px solid #FF0000;
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            width: 100%;
+            max-width: 250px;
+            margin-bottom: 15px;
+            margin-top: 15px;
+        }
+
+        .spin-btn:active:not(:disabled) {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        .spin-btn:disabled {
+            background-color: #555;
+            border-color: #333;
+            cursor: not-allowed;
+            color: #888;
+        }
+
+        .wheel-result {
+            color: #FF0000;
+            font-size: 1.5rem;
+            text-align: center;
+            text-shadow: 2px 2px 0px #FFFFFF;
+            margin-top: 15px;
+            min-height: 40px;
+        }
+
+        /* WHEEL SPINNER CELEBRATION */
+        #wheel-celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #FF0000 0%, #FFFFFF 50%, #FF0000 100%);
+            background-size: 200% 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            animation: wheelCelebration 4s ease-in-out forwards;
+        }
+
+        #wheel-celebration.active {
+            display: flex;
+        }
+
+        @keyframes wheelCelebration {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+                background-position: 0% 0%;
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+                background-position: 100% 0%;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.2);
+                background-position: 0% 0%;
+            }
+        }
+
+        .celebration-text {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-shadow: 8px 8px 0px #000000, 12px 12px 0px #FF0000;
+            text-align: center;
+            font-family: 'Press Start 2P', monospace;
+            line-height: 1.2;
+            animation: celebrationBounce 4s ease-in-out forwards;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes celebrationBounce {
+            0% {
+                transform: scale(0) rotateZ(-45deg);
+            }
+            50% {
+                transform: scale(1.1) rotateZ(5deg);
+            }
+            100% {
+                transform: scale(1) rotateZ(0deg);
+            }
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+</head>
+
+<body>
+
+    <div id="landing-page">
+        <h1>THREE<br>MAN</h1>
+        <p class="subtitle">A DICE & DRINK GAME</p>
+        <div class="container">
+            <input type="text" id="playerName" placeholder="ENTER NAME" autocomplete="off">
+            <button class="add-btn" id="addPlayerBtn">ADD PLAYER</button>
+            <ul class="player-list" id="playerList"></ul>
+            <button class="rules-btn" id="rulesBtn">VIEW RULES</button>
+            <button class="start-btn" id="startGameBtn">START GAME</button>
+        </div>
+    </div>
+
+    <div id="rules-modal">
+        <div class="rules-content">
+            <h2>GAME RULES</h2>
+            
+            <h3>THREE MAN TITLE</h3>
+            <p>If you roll a 3 on ANY die (2+1, 3+1, 3+any, etc), you become the Three Man.</p>
+            <p>Only the Three Man can pass the title by rolling a 3 again. They choose who gets it next.</p>
+
+            <h3>DOUBLES</h3>
+            <p>Roll the same number twice? You have two options:</p>
+            <p><strong>Option 1:</strong> Pass 1 die to 2 people. Each rolls and drinks for their result.</p>
+            <p><strong>Option 2:</strong> Pass both dice to 1 person. They roll and drink for the sum.</p>
+            <p><strong>THE CYCLE:</strong> If the 2 people who received dice both roll the SAME number, they escape drinking! Dice go back to you.</p>
+            <p>You roll again, and if they match again, the multiplier increases:<br>
+            • 1st match: 3x multiplier<br>
+            • 2nd match: 4x multiplier<br>
+            • 3rd match: 5x multiplier (and so on...)</p>
+            <p>Each match continues the cycle. When they finally roll different numbers, they drink their individual roll × current multiplier!</p>
+
+            <h3>LUCKY 7</h3>
+            <p>Rolled a 7? The player to your RIGHT drinks.</p>
+
+            <h3>ELEVEN</h3>
+            <p>Rolled an 11? The player to your LEFT drinks.</p>
+
+            <h3>SOCIAL 9</h3>
+            <p>Rolled a 9? EVERYONE drinks!</p>
+
+            <h3>ANYTHING ELSE</h3>
+            <p>Nothing special happens. Turn passes to the next player.</p>
+
+            <button class="close-rules-btn" id="closeRulesBtn">CLOSE</button>
+        </div>
+    </div>
+
+    <div id="wheel-screen">
+        <h2>WHO IS THE THREE MAN?</h2>
+        <div class="wheel-container">
+            <div class="wheel-pointer-bottom"></div>
+            <svg id="spin-wheel" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <button class="spin-btn" id="spinWheelBtn">SPIN THE WHEEL</button>
+        <div class="wheel-result" id="wheel-result"></div>
+    </div>
+
+    <div id="game-screen">
+        <div id="canvas-container"></div>
+
+        <div id="ui-layer">
+            <div class="hud-top">
+                <div class="three-man-banner" id="hud-threeman">THREE MAN: NONE</div>
+                <div class="turn-indicator" id="hud-turn">ROLLER: ---</div>
+            </div>
+            <div class="hud-bottom">
+                <button class="roll-btn" id="rollBtn">ROLL DICE</button>
+            </div>
+        </div>
+
+        <div id="action-prompt">
+            <h2 id="prompt-title">ROLL!</h2>
+            <p id="prompt-desc">Action description goes here.</p>
+
+            <div id="dice-distribution"></div>
+
+            <button class="dismiss-btn" id="dismissBtn">GOT IT</button>
+
+            <div id="player-select-list"></div>
+        </div>
+
+        <div id="three-animation-layer">
+            <div class="giant-three">3</div>
+            <div class="new-three-man-text" id="flash-text">NEW THREE MAN!</div>
+        </div>
+    </div>
+
+    <div id="drinking-timer">
+        <div class="timer-content">
+            <div class="timer-player-name" id="timer-player-name">---</div>
+            <div class="timer-display" id="timer-seconds">0</div>
+            <div class="timer-instruction">DRINK FOR THE SECONDS!</div>
+        </div>
+    </div>
+
+    <div id="wheel-celebration">
+        <div class="celebration-text" id="celebration-text"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. GAME STATE MANAGER
+        // ==========================================
+        let players = [];
+        let currentPlayerIndex = 0;
+        let currentThreeMan = null;
+        let nextRollerIndex = 0;
+
+        const nameInput = document.getElementById('playerName');
+        const playerListEl = document.getElementById('playerList');
+
+        function addPlayer() {
+            const name = nameInput.value.trim().toUpperCase();
+            if (name === "") return alert("Please enter a name.");
+            if (players.includes(name)) return alert("Player already added!");
+
+            players.push(name);
+            nameInput.value = '';
+
+            playerListEl.innerHTML = '';
+            players.forEach((p, i) => {
+                const li = document.createElement('li');
+                li.textContent = `${i + 1}. ${p}`;
+                playerListEl.appendChild(li);
+            });
+        }
+
+        document.getElementById('addPlayerBtn').addEventListener('click', addPlayer);
+        document.getElementById('rulesBtn').addEventListener('click', () => {
+            document.getElementById('rules-modal').classList.add('active');
+        });
+        document.getElementById('closeRulesBtn').addEventListener('click', () => {
+            document.getElementById('rules-modal').classList.remove('active');
+        });
+        document.getElementById('startGameBtn').addEventListener('click', () => {
+            if (players.length < 2) return alert("You need at least 2 players!");
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('wheel-screen').style.display = 'flex';
+            initWheelScreen();
+        });
+
+        function updateHUD() {
+            document.getElementById('hud-turn').textContent = `ROLLER: ${players[currentPlayerIndex]}`;
+            document.getElementById('hud-threeman').textContent = currentThreeMan ? `THREE MAN: ${currentThreeMan}` : `THREE MAN: NONE`;
+        }
+
+        // ==========================================
+        // 2. SPIN WHEEL FOR INITIAL THREE MAN
+        // ==========================================
+        let isSpinning = false;
+
+        function initWheelScreen() {
+            const numPlayers = players.length;
+            const wheel = document.getElementById('spin-wheel');
+            const segmentAngle = 360 / numPlayers;
+            const radius = 150; // SVG viewBox is 300x300, so radius is 150
+            const centerX = 150;
+            const centerY = 150;
+            
+            // Retro pop color palette
+            const retroColors = [
+                '#C00707', // Dark Red
+                '#F44400', // Orange-Red
+                '#FFB33F', // Golden Yellow
+                '#134E8E', // Dark Blue
+                '#00D084', // Bright Pop Green
+                '#FF6B9D', // Pop Pink
+                '#FFC300', // Bright Yellow
+                '#2ECC71', // Lime Green
+                '#E74C3C', // Bright Red
+                '#9B59B6'  // Pop Purple
+            ];
+            
+            wheel.innerHTML = ''; // Clear previous content
+            
+            // Create outer circle border
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', centerX);
+            circle.setAttribute('cy', centerY);
+            circle.setAttribute('r', radius);
+            circle.setAttribute('fill', 'none');
+            circle.setAttribute('stroke', '#FF0000');
+            circle.setAttribute('stroke-width', '6');
+            wheel.appendChild(circle);
+            
+            // Create segments and text labels
+            players.forEach((player, index) => {
+                const startAngle = (segmentAngle * index - 90) * (Math.PI / 180); // Convert to radians, start at top
+                const endAngle = ((segmentAngle * (index + 1)) - 90) * (Math.PI / 180);
+                
+                // Create pie slice using SVG path
+                const x1 = centerX + radius * Math.cos(startAngle);
+                const y1 = centerY + radius * Math.sin(startAngle);
+                const x2 = centerX + radius * Math.cos(endAngle);
+                const y2 = centerY + radius * Math.sin(endAngle);
+                
+                const largeArc = segmentAngle > 180 ? 1 : 0;
+                const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData);
+                
+                // Assign color from palette, cycling if more players than colors
+                const colorIndex = index % retroColors.length;
+                path.setAttribute('fill', retroColors[colorIndex]);
+                path.setAttribute('stroke', '#000000');
+                path.setAttribute('stroke-width', '2');
+                wheel.appendChild(path);
+                
+                // Add player name text
+                const midAngle = (startAngle + endAngle) / 2;
+                const midAngleDegrees = midAngle * (180 / Math.PI);
+                const textRadius = radius * 0.50; // Position text closer to center of slice
+                const textX = centerX + textRadius * Math.cos(midAngle);
+                const textY = centerY + textRadius * Math.sin(midAngle);
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', textX);
+                text.setAttribute('y', textY);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('font-size', '20');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('fill', '#000000');
+                text.setAttribute('font-family', 'Arial, sans-serif');
+                text.setAttribute('transform', `rotate(${midAngleDegrees} ${textX} ${textY})`);
+                text.setAttribute('stroke', '#FFFFFF');
+                text.setAttribute('stroke-width', '0.5');
+                text.setAttribute('paint-order', 'stroke');
+                text.textContent = player;
+                wheel.appendChild(text);
+            });
+            
+            // Reset spin button
+            document.getElementById('spinWheelBtn').disabled = false;
+            document.getElementById('spinWheelBtn').textContent = 'SPIN THE WHEEL';
+            document.getElementById('wheel-result').textContent = '';
+            isSpinning = false;
+            
+            // Set initial rotation
+            const initialRotation = Math.random() * 360;
+            wheel.style.transform = `rotate(${initialRotation}deg)`;
+            wheel.style.transition = 'none';
+        }
+
+        document.getElementById('spinWheelBtn').addEventListener('click', () => {
+            if (isSpinning) return;
+            isSpinning = true;
+            document.getElementById('spinWheelBtn').disabled = true;
+
+            const wheel = document.getElementById('spin-wheel');
+            const numPlayers = players.length;
+            const segmentAngle = 360 / numPlayers;
+            
+            // Select a random winning player
+            const winningPlayerIndex = Math.floor(Math.random() * numPlayers);
+            const winningPlayer = players[winningPlayerIndex];
+
+            // Get current rotation
+            const currentRotation = parseFloat(wheel.style.transform.replace('rotate(', '').replace('deg)', '')) || 0;
+            
+            // Calculate target rotation to align winning player to the top
+            // We need to rotate so the winning player's segment is at the top (90 degrees in the SVG coordinate system)
+            const targetSegmentPosition = 90;
+            const winningSegmentStartAngle = winningPlayerIndex * segmentAngle - 90;
+            const winningSegmentMidAngle = winningSegmentStartAngle + (segmentAngle / 2);
+            
+            // Calculate how many degrees to rotate
+            const degreesToRotate = targetSegmentPosition - winningSegmentMidAngle;
+            
+            // Add multiple full spins
+            const fullSpins = 5 * 360;
+            const finalRotation = currentRotation + fullSpins + degreesToRotate;
+
+            wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            wheel.style.transform = `rotate(${finalRotation}deg)`;
+            
+            setTimeout(() => {
+                currentThreeMan = winningPlayer;
+                currentPlayerIndex = winningPlayerIndex;
+                
+                // Show celebration animation
+                const celebration = document.getElementById('wheel-celebration');
+                const celebrationText = document.getElementById('celebration-text');
+                celebrationText.textContent = `${winningPlayer}\nIS THE\nTHREE MAN!`;
+                celebration.classList.add('active');
+                
+                // Show result text after animation completes
+                setTimeout(() => {
+                    celebration.classList.remove('active');
+                    document.getElementById('wheel-result').textContent = `${winningPlayer} IS THE THREE MAN!`;
+                    document.getElementById('spinWheelBtn').textContent = 'START GAME';
+                    document.getElementById('spinWheelBtn').disabled = false;
+                    
+                    // Change button to start game
+                    document.getElementById('spinWheelBtn').onclick = () => {
+                        document.getElementById('wheel-screen').style.display = 'none';
+                        document.getElementById('game-screen').style.display = 'block';
+                        updateHUD();
+                        init3D();
+                    };
+                }, 4000);
+                
+                isSpinning = false;
+            }, 4000);
+        });
+
+        // ==========================================
+        // 3. THREE.JS & CANNON.JS PHYSICS ENGINE
+        // ==========================================
+        let scene, camera, renderer, world;
+        let diceArray = [];
+        let isRolling = false;
+        let rollCheckInterval;
+
+        function init3D() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 15, 10);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xff0000, 0.8);
+            dirLight.position.set(5, 10, 5);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            world = new CANNON.World();
+            world.gravity.set(0, -25, 0); // Smoother gravity
+            world.broadphase = new CANNON.NaiveBroadphase();
+
+            // PHYSICS MATERIALS (For bouncy, realistic friction)
+            const dicePhysicsMaterial = new CANNON.Material("dice");
+            const floorPhysicsMaterial = new CANNON.Material("floor");
+            const wallPhysicsMaterial = new CANNON.Material("wall");
+
+            const diceFloorContact = new CANNON.ContactMaterial(dicePhysicsMaterial, floorPhysicsMaterial, { friction: 0.3, restitution: 0.6 });
+            const diceWallContact = new CANNON.ContactMaterial(dicePhysicsMaterial, wallPhysicsMaterial, { friction: 0.2, restitution: 0.5 });
+            const diceDiceContact = new CANNON.ContactMaterial(dicePhysicsMaterial, dicePhysicsMaterial, { friction: 0.25, restitution: 0.5 });
+
+            world.addContactMaterial(diceFloorContact);
+            world.addContactMaterial(diceWallContact);
+            world.addContactMaterial(diceDiceContact);
+
+            // Invisible Floor
+            const floorBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane(), material: floorPhysicsMaterial });
+            floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+            world.addBody(floorBody);
+
+            // Invisible Walls
+            const wallOptions = { mass: 0, shape: new CANNON.Box(new CANNON.Vec3(10, 10, 0.5)), material: wallPhysicsMaterial };
+            const wallTop = new CANNON.Body(wallOptions); wallTop.position.set(0, 5, -6); world.addBody(wallTop);
+            const wallBottom = new CANNON.Body(wallOptions); wallBottom.position.set(0, 5, 6); world.addBody(wallBottom);
+            const wallLeft = new CANNON.Body(wallOptions); wallLeft.position.set(-4, 5, 0); wallLeft.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), Math.PI / 2); world.addBody(wallLeft);
+            const wallRight = new CANNON.Body(wallOptions); wallRight.position.set(4, 5, 0); wallRight.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), Math.PI / 2); world.addBody(wallRight);
+
+            createDie(-1, dicePhysicsMaterial);
+            createDie(1, dicePhysicsMaterial);
+
+            animate();
+        }
+
+        function createDiceTexture(number) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128; canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, 128, 128);
+            ctx.strokeStyle = '#FF0000'; ctx.lineWidth = 10; ctx.strokeRect(0, 0, 128, 128);
+            ctx.fillStyle = '#000000'; ctx.font = 'bold 80px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(number, 64, 74);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createDie(xOffset, physicsMaterial) {
+            const materials = [
+                new THREE.MeshStandardMaterial({ map: createDiceTexture('1') }),
+                new THREE.MeshStandardMaterial({ map: createDiceTexture('6') }),
+                new THREE.MeshStandardMaterial({ map: createDiceTexture('2') }),
+                new THREE.MeshStandardMaterial({ map: createDiceTexture('5') }),
+                new THREE.MeshStandardMaterial({ map: createDiceTexture('3') }),
+                new THREE.MeshStandardMaterial({ map: createDiceTexture('4') })
+            ];
+            const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+            const mesh = new THREE.Mesh(geometry, materials);
+            mesh.castShadow = true;
+            scene.add(mesh);
+
+            const shape = new CANNON.Box(new CANNON.Vec3(0.75, 0.75, 0.75));
+            const body = new CANNON.Body({ mass: 1, shape: shape, material: physicsMaterial });
+
+            // Damping for smooth rolling
+            body.linearDamping = 0.3;
+            body.angularDamping = 0.2;
+
+            body.position.set(xOffset * 2, 8, 0);
+            world.addBody(body);
+
+            diceArray.push({ mesh, body });
+        }
+
+        let lastTime;
+        function animate(time) {
+            requestAnimationFrame(animate);
+            if (lastTime !== undefined) {
+                let dt = (time - lastTime) / 1000;
+                world.step(1 / 60, dt, 3); // Dynamic step for smoother framerates
+            }
+            lastTime = time;
+
+            diceArray.forEach(die => {
+                die.mesh.position.copy(die.body.position);
+                die.mesh.quaternion.copy(die.body.quaternion);
+            });
+            renderer.render(scene, camera);
+        }
+
+        function getDieResult(mesh) {
+            const faceNormals = [
+                { vec: new THREE.Vector3(1, 0, 0), val: 1 }, { vec: new THREE.Vector3(-1, 0, 0), val: 6 },
+                { vec: new THREE.Vector3(0, 1, 0), val: 2 }, { vec: new THREE.Vector3(0, -1, 0), val: 5 },
+                { vec: new THREE.Vector3(0, 0, 1), val: 3 }, { vec: new THREE.Vector3(0, 0, -1), val: 4 }
+            ];
+            let highestY = -Infinity; let topValue = 1;
+            faceNormals.forEach(face => {
+                const worldVec = face.vec.clone().applyQuaternion(mesh.quaternion);
+                if (worldVec.y > highestY) { highestY = worldVec.y; topValue = face.val; }
+            });
+            return topValue;
+        }
+
+        // ==========================================
+        // 4. THE ROLL ACTION & LOGIC
+        // ==========================================
+        document.getElementById('rollBtn').addEventListener('click', () => {
+            if (isRolling) return;
+            isRolling = true;
+            document.getElementById('rollBtn').disabled = true;
+            document.getElementById('rollBtn').textContent = "ROLLING...";
+
+            diceArray.forEach((die, index) => {
+                const modifier = index === 0 ? -1 : 1;
+                // Add slightly randomized drop heights so they don't sync up perfectly
+                die.body.position.set(modifier * 2 + (Math.random() - 0.5), 10 + Math.random() * 2, -3);
+                die.body.velocity.set(modifier * (Math.random() * 4), -8, Math.random() * 8);
+                die.body.angularVelocity.set(Math.random() * 15, Math.random() * 15, Math.random() * 15);
+            });
+
+            setTimeout(() => { rollCheckInterval = setInterval(checkIfAsleep, 100); }, 500);
+        });
+
+        function checkIfAsleep() {
+            let stopped = true;
+            diceArray.forEach(die => {
+                if (die.body.velocity.lengthSquared() > 0.05 || die.body.angularVelocity.lengthSquared() > 0.05) { stopped = false; }
+            });
+
+            if (stopped) {
+                clearInterval(rollCheckInterval);
+                processRollResults();
+            }
+        }
+
+        function processRollResults() {
+            const die1 = getDieResult(diceArray[0].mesh);
+            const die2 = getDieResult(diceArray[1].mesh);
+            const sum = die1 + die2;
+            const rollerName = players[currentPlayerIndex];
+
+            let prompts = [];
+            let passTurn = true;
+            let triggerThreeAnimation = false;
+            let showThreeManSelection = false;
+
+            const isThreeRolled = (die1 === 3 || die2 === 3);
+
+            // RULE 1: If you're the Three Man and roll a 3, you pass it
+            if (currentThreeMan === rollerName && isThreeRolled) {
+                prompts.push(`YOU ROLLED A 3! PASS THE TITLE!`);
+                showThreeManSelection = true;
+            }
+            // RULE 2: If you roll a 3 (any die shows 3), you become the New Three Man
+            else if (isThreeRolled) {
+                currentThreeMan = rollerName;
+                triggerThreeAnimation = true;
+                prompts.push(`${rollerName} IS THE NEW THREE MAN!`);
+            }
+
+            // RULE 4: Action Rolls
+            if (die1 === die2) {
+                passTurn = false;
+                // For doubles, we'll handle via distribution system
+                prompts.push(`DOUBLES! ${rollerName} picks how to distribute the dice!`);
+                // Mark this as a doubles roll for special handling
+                document.getElementById('prompt-title').textContent = `ROLLED ${sum}`;
+                document.getElementById('prompt-desc').innerHTML = prompts.join('<br><br>');
+                showDoublesDistribution(die1, rollerName, nextRollerIndex);
+                return; // Exit early to show distribution options
+            } else if (sum === 7) {
+                prompts.push(`7! ${players[(currentPlayerIndex + 1) % players.length]} (Right) drinks!`);
+            } else if (sum === 11) {
+                prompts.push(`11! ${players[(currentPlayerIndex - 1 + players.length) % players.length]} (Left) drinks!`);
+            } else if (sum === 9) {
+                prompts.push(`9! SOCIAL! Everyone drinks!`);
+            }
+
+            if (prompts.length === 0) prompts.push("Nothing happens.");
+
+            if (passTurn) {
+                nextRollerIndex = (currentPlayerIndex + 1) % players.length;
+                document.getElementById('dismissBtn').textContent = `PASS TO ${players[nextRollerIndex]}`;
+            } else {
+                nextRollerIndex = currentPlayerIndex;
+                document.getElementById('dismissBtn').textContent = `ROLL AGAIN`;
+            }
+
+            document.getElementById('prompt-title').textContent = `ROLLED ${sum}`;
+            document.getElementById('prompt-desc').innerHTML = prompts.join('<br><br>');
+
+            // Dynamic UI Setup for Passing Three Man
+            const selectList = document.getElementById('player-select-list');
+            const dismissBtn = document.getElementById('dismissBtn');
+
+            if (showThreeManSelection) {
+                dismissBtn.style.display = 'none';
+                selectList.style.display = 'flex';
+                selectList.innerHTML = '';
+
+                players.forEach(p => {
+                    if (p !== rollerName) {
+                        const btn = document.createElement('button');
+                        btn.className = 'select-btn';
+                        btn.textContent = `GIVE TO ${p}`;
+                        btn.onclick = () => triggerThreeManTransfer(p, nextRollerIndex);
+                        selectList.appendChild(btn);
+                    }
+                });
+            } else {
+                dismissBtn.style.display = 'block';
+                selectList.style.display = 'none';
+            }
+
+            // Fire Animations
+            if (triggerThreeAnimation) {
+                const flash = document.getElementById('three-animation-layer');
+                document.getElementById('flash-text').textContent = `${rollerName} IS THE NEW THREE MAN!`;
+                flash.classList.add('flash');
+                setTimeout(() => {
+                    flash.classList.remove('flash');
+                    setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
+                }, 2000);
+            } else {
+                setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
+            }
+        }
+
+        // ==========================================
+        // 5. DOUBLES DISTRIBUTION SYSTEM
+        // ==========================================
+        let doublesRollData = {};
+        let doublesMatchCycle = 0; // Track how many times matches have occurred
+
+        function showDoublesDistribution(diceValue, rollerName, nextRoller) {
+            doublesRollData = { diceValue, rollerName, nextRoller };
+            doublesMatchCycle = 0; // Reset cycle counter on new doubles roll
+            
+            const distDiv = document.getElementById('dice-distribution');
+            distDiv.style.display = 'flex';
+            distDiv.innerHTML = '';
+
+            const option1 = document.createElement('button');
+            option1.className = 'distribution-option';
+            option1.textContent = 'PASS 1 DIE TO 2 PEOPLE';
+            option1.onclick = () => selectPlayersForDistribution('one-die-two-people', diceValue);
+            distDiv.appendChild(option1);
+
+            const option2 = document.createElement('button');
+            option2.className = 'distribution-option';
+            option2.textContent = 'PASS BOTH DICE TO 1 PERSON';
+            option2.onclick = () => selectPlayersForDistribution('both-dice-one-person', diceValue);
+            distDiv.appendChild(option2);
+
+            document.getElementById('player-select-list').style.display = 'none';
+            document.getElementById('dismissBtn').style.display = 'none';
+            
+            setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
+        }
+
+        function selectPlayersForDistribution(distributionType, diceValue) {
+            const selectList = document.getElementById('player-select-list');
+            selectList.style.display = 'flex';
+            selectList.innerHTML = '';
+            document.getElementById('dice-distribution').style.display = 'none';
+
+            const othersOnly = players.filter(p => p !== doublesRollData.rollerName);
+            const maxSelections = (distributionType === 'one-die-two-people') ? 2 : 1;
+            let selectedPlayers = [];
+
+            othersOnly.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = 'select-btn';
+                btn.textContent = p;
+                btn.onclick = () => {
+                    if (selectedPlayers.includes(p)) {
+                        selectedPlayers = selectedPlayers.filter(x => x !== p);
+                        btn.style.backgroundColor = '#000000';
+                        btn.style.color = '#FFFFFF';
+                    } else if (selectedPlayers.length < maxSelections) {
+                        selectedPlayers.push(p);
+                        btn.style.backgroundColor = '#FF0000';
+                        btn.style.color = '#000000';
+                    }
+                };
+                selectList.appendChild(btn);
+            });
+
+            // Add confirm button
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'select-btn';
+            confirmBtn.textContent = `CONFIRM (${maxSelections - selectedPlayers.length} more)`;
+            confirmBtn.style.marginTop = '15px';
+            confirmBtn.style.backgroundColor = '#FFFFFF';
+            confirmBtn.style.color = '#000000';
+            confirmBtn.onclick = () => {
+                if (selectedPlayers.length === maxSelections) {
+                    executeDoublesRoll(distributionType, selectedPlayers, diceValue);
+                }
+            };
+            selectList.appendChild(confirmBtn);
+        }
+
+        function executeDoublesRoll(distributionType, selectedPlayers, diceValue) {
+            document.getElementById('action-prompt').classList.remove('active');
+            
+            // Roll for each selected player
+            const results = [];
+            selectedPlayers.forEach(playerName => {
+                // Simulate die roll (1-6)
+                const rollResult = Math.floor(Math.random() * 6) + 1;
+                results.push({ player: playerName, seconds: rollResult });
+            });
+
+            // Show each player's timer
+            showDrinkingTimers(results, doublesRollData.nextRoller, distributionType);
+        }
+
+        function showDrinkingTimers(results, nextRoller, distributionType) {
+            // Check if one-die-two-people and both rolled the same
+            if (distributionType === 'one-die-two-people' && results.length === 2 && results[0].seconds === results[1].seconds) {
+                // Both rolled the same! No drinks for them, re-roll for the original roller with DOUBLED penalty
+                doublesMatchCycle++; // Increment cycle counter
+                handleMatchingRoll(nextRoller);
+                return;
+            }
+
+            // Calculate multiplier based on cycle count
+            let multiplier = (doublesMatchCycle === 0) ? 1 : (doublesMatchCycle + 2);
+            
+            // Apply multiplier to results
+            const multipliedResults = results.map(r => ({ 
+                player: r.player, 
+                seconds: r.seconds * multiplier 
+            }));
+
+            let currentIndex = 0;
+
+            function showNextTimer() {
+                if (currentIndex >= multipliedResults.length) {
+                    // All timers done, end turn
+                    currentPlayerIndex = nextRoller;
+                    updateHUD();
+                    isRolling = false;
+                    document.getElementById('rollBtn').disabled = false;
+                    document.getElementById('rollBtn').textContent = "ROLL DICE";
+                    document.getElementById('dice-distribution').style.display = 'none';
+                    doublesMatchCycle = 0; // Reset cycle for next turn
+                    return;
+                }
+
+                const { player, seconds } = multipliedResults[currentIndex];
+                const timerEl = document.getElementById('drinking-timer');
+                document.getElementById('timer-player-name').textContent = player;
+                document.getElementById('timer-seconds').textContent = seconds;
+
+                timerEl.classList.add('active');
+
+                let countdown = seconds;
+                const interval = setInterval(() => {
+                    countdown--;
+                    document.getElementById('timer-seconds').textContent = countdown;
+                    
+                    if (countdown < 0) {
+                        clearInterval(interval);
+                        currentIndex++;
+                        timerEl.classList.remove('active');
+                        setTimeout(showNextTimer, 500);
+                    }
+                }, 1000);
+            }
+
+            showNextTimer();
+        }
+
+        function handleMatchingRoll(nextRoller) {
+            // Show a message that both players rolled the same
+            const timerEl = document.getElementById('drinking-timer');
+            const contentEl = timerEl.querySelector('.timer-content');
+            const nextMultiplier = doublesMatchCycle + 2; // Show what next multiplier will be
+            contentEl.innerHTML = `
+                <div style="font-size: 1.5rem; color: #FFFFFF; margin-bottom: 20px;">BOTH ROLLED THE SAME!</div>
+                <div style="font-size: 1.2rem; color: #FF0000; margin-bottom: 40px;">NO DRINKS FOR THEM!</div>
+                <div style="font-size: 1rem; color: #FFFFFF;">Rolling again for ${doublesRollData.rollerName}...</div>
+                <div style="font-size: 0.9rem; color: #FF0000; margin-top: 20px;">NEXT PENALTY: ${nextMultiplier}x MULTIPLIER!</div>
+            `;
+            timerEl.classList.add('active');
+
+            setTimeout(() => {
+                timerEl.classList.remove('active');
+                // Now roll again for the original roller
+                rerrollDoublesWithPenalty(nextRoller);
+            }, 3000);
+        }
+
+        function rerrollDoublesWithPenalty(nextRoller) {
+            // Manually trigger a re-roll for the original roller
+            diceArray.forEach((die, index) => {
+                const modifier = index === 0 ? -1 : 1;
+                die.body.position.set(modifier * 2 + (Math.random() - 0.5), 10 + Math.random() * 2, -3);
+                die.body.velocity.set(modifier * (Math.random() * 5), -10, Math.random() * 10);
+                die.body.angularVelocity.set(Math.random() * 20, Math.random() * 20, Math.random() * 20);
+            });
+
+            setTimeout(() => { 
+                rollCheckInterval = setInterval(checkIfAsleepForPenaltyRoll, 100); 
+            }, 500);
+
+            // Store the fact that the next roll should be doubled
+            window.penaltyRollActive = true;
+            window.penaltyRoller = doublesRollData.rollerName;
+            window.penaltyNextRoller = nextRoller;
+        }
+
+        function checkIfAsleepForPenaltyRoll() {
+            let stopped = true;
+            diceArray.forEach(die => {
+                if (die.body.velocity.lengthSquared() > 0.05 || die.body.angularVelocity.lengthSquared() > 0.05) { stopped = false; }
+            });
+
+            if (stopped) {
+                clearInterval(rollCheckInterval);
+                processPenaltyRollResults();
+            }
+        }
+
+        function processPenaltyRollResults() {
+            const die1 = getDieResult(diceArray[0].mesh);
+            const die2 = getDieResult(diceArray[1].mesh);
+            const sum = die1 + die2;
+            const doubledSum = sum * 2;
+            const rollerName = window.penaltyRoller;
+
+            const timerEl = document.getElementById('drinking-timer');
+            document.getElementById('timer-player-name').textContent = rollerName;
+            document.getElementById('timer-seconds').textContent = doubledSum;
+
+            timerEl.classList.add('active');
+
+            let countdown = doubledSum;
+            const interval = setInterval(() => {
+                countdown--;
+                document.getElementById('timer-seconds').textContent = countdown;
+                
+                if (countdown < 0) {
+                    clearInterval(interval);
+                    timerEl.classList.remove('active');
+                    
+                    // End the turn
+                    currentPlayerIndex = window.penaltyNextRoller;
+                    updateHUD();
+                    isRolling = false;
+                    document.getElementById('rollBtn').disabled = false;
+                    document.getElementById('rollBtn').textContent = "ROLL DICE";
+                    document.getElementById('dice-distribution').style.display = 'none';
+                    window.penaltyRollActive = false;
+                }
+            }, 1000);
+        }
+
+        // Dedicated function to handle the manual transfer of the title
+        function triggerThreeManTransfer(newPlayerName, nextRoller) {
+            currentThreeMan = newPlayerName;
+            document.getElementById('action-prompt').classList.remove('active');
+
+            // Fire the flash animation for the victim
+            const flash = document.getElementById('three-animation-layer');
+            document.getElementById('flash-text').textContent = `${newPlayerName} IS THE NEW THREE MAN!`;
+            flash.classList.add('flash');
+
+            setTimeout(() => {
+                flash.classList.remove('flash');
+
+                // Advance turn logic
+                currentPlayerIndex = nextRoller;
+                updateHUD();
+
+                // Unlock board
+                isRolling = false;
+                document.getElementById('rollBtn').disabled = false;
+                document.getElementById('rollBtn').textContent = "ROLL DICE";
+            }, 2000);
+        }
+
+        // Standard Dismiss Prompt & Next Turn
+        document.getElementById('dismissBtn').addEventListener('click', () => {
+            document.getElementById('action-prompt').classList.remove('active');
+            currentPlayerIndex = nextRollerIndex;
+            updateHUD();
+            isRolling = false;
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('rollBtn').textContent = "ROLL DICE";
+        });
+
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+
+</html>
