@@ -109,12 +109,33 @@
             border-left: 6px solid #FF0000;
             border-bottom: 2px dashed #333333;
             font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .remove-player-btn {
+            background: none;
+            border: none;
+            color: #FF0000;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .input-error {
+            color: #FF0000;
+            font-size: 0.7rem;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            min-height: 1em;
         }
 
         .start-btn {
-            background-color: #FFFFFF;
-            color: #000000;
-            border: 4px solid #FF0000;
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border: 4px solid #FFFFFF;
             font-size: 1.2rem;
             margin-top: 0;
             padding: 20px;
@@ -122,9 +143,9 @@
         }
 
         .start-btn:active {
-            background-color: #FF0000;
-            color: #FFFFFF;
-            border-color: #FFFFFF;
+            background-color: #FFFFFF;
+            color: #FF0000;
+            border-color: #FF0000;
         }
 
         /* --- GAME SCREEN --- */
@@ -167,20 +188,42 @@
 
         .three-man-banner {
             color: #FF0000;
-            font-size: 1rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 0px #FFFFFF;
-            line-height: 1.5;
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            text-shadow: 3px 3px 0px #FFFFFF;
+            line-height: 1.4;
+            letter-spacing: 0.05em;
         }
 
         .turn-indicator {
-            font-size: 0.8rem;
+            font-size: 1.1rem;
             color: #FFFFFF;
+            letter-spacing: 0.05em;
         }
 
         .hud-bottom {
             padding: 20px;
             pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .exit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #000000;
+            color: #FFFFFF;
+            border: 3px solid #555555;
+            font-size: 0.75rem;
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .exit-btn:active {
+            background-color: #333333;
+            border-color: #FF0000;
         }
 
         .roll-btn {
@@ -279,45 +322,6 @@
             border-color: #000000;
         }
 
-        /* GIANT '3' ANIMATION */
-        #three-animation-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #FFFFFF;
-            color: #FF0000;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.1s ease-in-out;
-        }
-
-        #three-animation-layer.flash {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .giant-three {
-            font-size: 12rem;
-            text-shadow: 10px 10px 0px #000000;
-            margin: 0;
-            line-height: 1;
-        }
-
-        .new-three-man-text {
-            font-size: 1.2rem;
-            color: #000000;
-            margin-top: 20px;
-            text-align: center;
-            padding: 0 20px;
-            line-height: 1.5;
-        }
 
         /* RULES BUTTON */
         .rules-btn {
@@ -485,10 +489,10 @@
             width: 100%;
             height: 100%;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-evenly;
             align-items: center;
             background-color: #000000;
-            padding: 20px;
+            padding: 30px 20px;
             box-sizing: border-box;
             position: relative;
             z-index: 100;
@@ -496,17 +500,30 @@
 
         #wheel-screen h2 {
             color: #FF0000;
-            font-size: 2rem;
-            margin-bottom: 25px;
-            text-shadow: 2px 2px 0px #FFFFFF;
+            font-size: clamp(1.8rem, 8vw, 4rem);
+            margin: 0;
+            text-shadow: 4px 4px 0px #FFFFFF;
             text-align: center;
+            line-height: 1.4;
+        }
+
+        .current-three-man-display {
+            color: #FFFFFF;
+            font-size: clamp(1rem, 3.5vw, 1.5rem);
+            text-shadow: 3px 3px 0px #FF0000;
+            text-align: center;
+            font-family: 'Press Start 2P', monospace;
+            display: none;
+        }
+
+        .current-three-man-display.active {
+            display: block;
         }
 
         .wheel-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin-bottom: 25px;
+            width: min(75vw, 75vh, 420px);
+            height: min(75vw, 75vh, 420px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -516,7 +533,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            box-shadow: 0 0 20px #FF0000;
+            box-shadow: 0 0 30px #FF0000;
             transition: transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
@@ -562,21 +579,22 @@
         }
 
         .spin-btn {
-            background-color: #FFFFFF;
-            color: #000000;
-            border: 4px solid #FF0000;
-            padding: 20px 40px;
-            font-size: 1.2rem;
-            width: 100%;
-            max-width: 250px;
-            margin-bottom: 15px;
-            margin-top: 15px;
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border: 6px solid #FFFFFF;
+            padding: clamp(18px, 4vw, 28px) clamp(20px, 5vw, 40px);
+            font-size: clamp(1.1rem, 5vw, 1.8rem);
+            font-family: 'Press Start 2P', monospace;
+            width: 90%;
+            max-width: 500px;
+            cursor: pointer;
+            text-transform: uppercase;
         }
 
         .spin-btn:active:not(:disabled) {
-            background-color: #FF0000;
-            color: #FFFFFF;
-            border-color: #FFFFFF;
+            background-color: #FFFFFF;
+            color: #FF0000;
+            border-color: #FF0000;
         }
 
         .spin-btn:disabled {
@@ -588,78 +606,13 @@
 
         .wheel-result {
             color: #FF0000;
-            font-size: 1.5rem;
+            font-size: clamp(1.4rem, 6.5vw, 2.4rem);
             text-align: center;
-            text-shadow: 2px 2px 0px #FFFFFF;
-            margin-top: 15px;
-            min-height: 40px;
+            text-shadow: 3px 3px 0px #FFFFFF;
+            min-height: 2em;
+            line-height: 1.5;
         }
 
-        /* WHEEL SPINNER CELEBRATION */
-        #wheel-celebration {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #FF0000 0%, #FFFFFF 50%, #FF0000 100%);
-            background-size: 200% 100%;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 300;
-            opacity: 0;
-            pointer-events: none;
-            animation: wheelCelebration 4s ease-in-out forwards;
-        }
-
-        #wheel-celebration.active {
-            display: flex;
-        }
-
-        @keyframes wheelCelebration {
-            0% {
-                opacity: 0;
-                transform: scale(0.5);
-                background-position: 0% 0%;
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1);
-                background-position: 100% 0%;
-            }
-            100% {
-                opacity: 0;
-                transform: scale(1.2);
-                background-position: 0% 0%;
-            }
-        }
-
-        .celebration-text {
-            font-size: 4rem;
-            font-weight: bold;
-            color: #FFFFFF;
-            text-shadow: 8px 8px 0px #000000, 12px 12px 0px #FF0000;
-            text-align: center;
-            font-family: 'Press Start 2P', monospace;
-            line-height: 1.2;
-            animation: celebrationBounce 4s ease-in-out forwards;
-            position: relative;
-            z-index: 1;
-        }
-
-        @keyframes celebrationBounce {
-            0% {
-                transform: scale(0) rotateZ(-45deg);
-            }
-            50% {
-                transform: scale(1.1) rotateZ(5deg);
-            }
-            100% {
-                transform: scale(1) rotateZ(0deg);
-            }
-        }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -673,6 +626,7 @@
         <p class="subtitle">A DICE & DRINK GAME</p>
         <div class="container">
             <input type="text" id="playerName" placeholder="ENTER NAME" autocomplete="off">
+            <div class="input-error" id="playerError"></div>
             <button class="add-btn" id="addPlayerBtn">ADD PLAYER</button>
             <ul class="player-list" id="playerList"></ul>
             <button class="rules-btn" id="rulesBtn">VIEW RULES</button>
@@ -717,6 +671,7 @@
 
     <div id="wheel-screen">
         <h2>WHO IS THE THREE MAN?</h2>
+        <div class="current-three-man-display" id="current-three-man-display"></div>
         <div class="wheel-container">
             <div class="wheel-pointer-bottom"></div>
             <svg id="spin-wheel" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -735,6 +690,7 @@
             </div>
             <div class="hud-bottom">
                 <button class="roll-btn" id="rollBtn">ROLL DICE</button>
+                <button class="exit-btn" id="exitToMenuBtn">EXIT TO MENU</button>
             </div>
         </div>
 
@@ -749,10 +705,6 @@
             <div id="player-select-list"></div>
         </div>
 
-        <div id="three-animation-layer">
-            <div class="giant-three">3</div>
-            <div class="new-three-man-text" id="flash-text">NEW THREE MAN!</div>
-        </div>
     </div>
 
     <div id="drinking-timer">
@@ -763,9 +715,6 @@
         </div>
     </div>
 
-    <div id="wheel-celebration">
-        <div class="celebration-text" id="celebration-text"></div>
-    </div>
 
     <script>
         // ==========================================
@@ -778,24 +727,45 @@
 
         const nameInput = document.getElementById('playerName');
         const playerListEl = document.getElementById('playerList');
+        const playerError = document.getElementById('playerError');
 
-        function addPlayer() {
-            const name = nameInput.value.trim().toUpperCase();
-            if (name === "") return alert("Please enter a name.");
-            if (players.includes(name)) return alert("Player already added!");
+        function showError(msg) {
+            playerError.textContent = msg;
+            setTimeout(() => { playerError.textContent = ''; }, 2500);
+        }
 
-            players.push(name);
-            nameInput.value = '';
-
+        function renderPlayerList() {
             playerListEl.innerHTML = '';
             players.forEach((p, i) => {
                 const li = document.createElement('li');
-                li.textContent = `${i + 1}. ${p}`;
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = `${i + 1}. ${p}`;
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-player-btn';
+                removeBtn.textContent = 'X';
+                removeBtn.setAttribute('aria-label', `Remove ${p}`);
+                removeBtn.onclick = () => {
+                    players.splice(i, 1);
+                    renderPlayerList();
+                };
+                li.appendChild(nameSpan);
+                li.appendChild(removeBtn);
                 playerListEl.appendChild(li);
             });
         }
 
+        function addPlayer() {
+            const name = nameInput.value.trim().toUpperCase();
+            if (name === "") return showError("ENTER A NAME FIRST.");
+            if (players.includes(name)) return showError(`${name} IS ALREADY ADDED!`);
+
+            players.push(name);
+            nameInput.value = '';
+            renderPlayerList();
+        }
+
         document.getElementById('addPlayerBtn').addEventListener('click', addPlayer);
+        nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPlayer(); });
         document.getElementById('rulesBtn').addEventListener('click', () => {
             document.getElementById('rules-modal').classList.add('active');
         });
@@ -803,7 +773,7 @@
             document.getElementById('rules-modal').classList.remove('active');
         });
         document.getElementById('startGameBtn').addEventListener('click', () => {
-            if (players.length < 2) return alert("You need at least 2 players!");
+            if (players.length < 2) return showError("NEED AT LEAST 2 PLAYERS!");
             document.getElementById('landing-page').style.display = 'none';
             document.getElementById('wheel-screen').style.display = 'flex';
             initWheelScreen();
@@ -826,6 +796,15 @@
             const radius = 150; // SVG viewBox is 300x300, so radius is 150
             const centerX = 150;
             const centerY = 150;
+            
+            // Update the current three man display only if set
+            const display = document.getElementById('current-three-man-display');
+            if (currentThreeMan && currentThreeMan !== 'null') {
+                display.textContent = `${currentThreeMan} IS THE THREE MAN!`;
+                display.classList.add('active');
+            } else {
+                display.classList.remove('active');
+            }
             
             // Retro pop color palette
             const retroColors = [
@@ -948,30 +927,17 @@
             setTimeout(() => {
                 currentThreeMan = winningPlayer;
                 currentPlayerIndex = winningPlayerIndex;
-                
-                // Show celebration animation
-                const celebration = document.getElementById('wheel-celebration');
-                const celebrationText = document.getElementById('celebration-text');
-                celebrationText.textContent = `${winningPlayer}\nIS THE\nTHREE MAN!`;
-                celebration.classList.add('active');
-                
-                // Show result text after animation completes
-                setTimeout(() => {
-                    celebration.classList.remove('active');
-                    document.getElementById('wheel-result').textContent = `${winningPlayer} IS THE THREE MAN!`;
-                    document.getElementById('spinWheelBtn').textContent = 'START GAME';
-                    document.getElementById('spinWheelBtn').disabled = false;
-                    
-                    // Change button to start game
-                    document.getElementById('spinWheelBtn').onclick = () => {
-                        document.getElementById('wheel-screen').style.display = 'none';
-                        document.getElementById('game-screen').style.display = 'block';
-                        updateHUD();
-                        init3D();
-                    };
-                }, 4000);
-                
                 isSpinning = false;
+
+                document.getElementById('wheel-result').textContent = `${winningPlayer} IS THE THREE MAN!`;
+                document.getElementById('spinWheelBtn').textContent = 'START GAME';
+                document.getElementById('spinWheelBtn').disabled = false;
+                document.getElementById('spinWheelBtn').onclick = () => {
+                    document.getElementById('wheel-screen').style.display = 'none';
+                    document.getElementById('game-screen').style.display = 'block';
+                    updateHUD();
+                    init3D();
+                };
             }, 4000);
         });
 
@@ -1146,34 +1112,42 @@
 
             let prompts = [];
             let passTurn = true;
-            let triggerThreeAnimation = false;
             let showThreeManSelection = false;
 
             const isThreeRolled = (die1 === 3 || die2 === 3);
+            const isDoubles = (die1 === die2);
 
-            // RULE 1: If you're the Three Man and roll a 3, you pass it
+            // RULE 4: Action Rolls — handle doubles first so Three Man state isn't
+            // mutated before the doubles UI resolves (e.g. rolling 3+3)
+            if (isDoubles) {
+                passTurn = false;
+                const doublesNextRoller = (currentPlayerIndex + 1) % players.length;
+                // If a 3 is involved, queue the Three Man effect to fire after doubles resolve
+                if (isThreeRolled) {
+                    doublesRollData.pendingThreeManRoller = rollerName;
+                    doublesRollData.pendingThreeManIsCurrentThreeMan = (currentThreeMan === rollerName);
+                } else {
+                    doublesRollData.pendingThreeManRoller = null;
+                }
+                prompts.push(`DOUBLES! ${rollerName} picks how to distribute the dice!`);
+                document.getElementById('prompt-title').textContent = `ROLLED ${sum}`;
+                document.getElementById('prompt-desc').innerHTML = prompts.join('<br><br>');
+                showDoublesDistribution(die1, rollerName, doublesNextRoller);
+                return; // Exit early to show distribution options
+            }
+
+            // RULE 1: If you're the Three Man and roll a 3 (non-doubles), you pass it
             if (currentThreeMan === rollerName && isThreeRolled) {
                 prompts.push(`YOU ROLLED A 3! PASS THE TITLE!`);
                 showThreeManSelection = true;
             }
-            // RULE 2: If you roll a 3 (any die shows 3), you become the New Three Man
+            // RULE 2: If you roll a 3 (non-doubles), you become the new Three Man
             else if (isThreeRolled) {
                 currentThreeMan = rollerName;
-                triggerThreeAnimation = true;
                 prompts.push(`${rollerName} IS THE NEW THREE MAN!`);
             }
 
-            // RULE 4: Action Rolls
-            if (die1 === die2) {
-                passTurn = false;
-                // For doubles, we'll handle via distribution system
-                prompts.push(`DOUBLES! ${rollerName} picks how to distribute the dice!`);
-                // Mark this as a doubles roll for special handling
-                document.getElementById('prompt-title').textContent = `ROLLED ${sum}`;
-                document.getElementById('prompt-desc').innerHTML = prompts.join('<br><br>');
-                showDoublesDistribution(die1, rollerName, nextRollerIndex);
-                return; // Exit early to show distribution options
-            } else if (sum === 7) {
+            if (sum === 7) {
                 prompts.push(`7! ${players[(currentPlayerIndex + 1) % players.length]} (Right) drinks!`);
             } else if (sum === 11) {
                 prompts.push(`11! ${players[(currentPlayerIndex - 1 + players.length) % players.length]} (Left) drinks!`);
@@ -1217,18 +1191,7 @@
                 selectList.style.display = 'none';
             }
 
-            // Fire Animations
-            if (triggerThreeAnimation) {
-                const flash = document.getElementById('three-animation-layer');
-                document.getElementById('flash-text').textContent = `${rollerName} IS THE NEW THREE MAN!`;
-                flash.classList.add('flash');
-                setTimeout(() => {
-                    flash.classList.remove('flash');
-                    setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
-                }, 2000);
-            } else {
-                setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
-            }
+            setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
         }
 
         // ==========================================
@@ -1273,6 +1236,13 @@
             const maxSelections = (distributionType === 'one-die-two-people') ? 2 : 1;
             let selectedPlayers = [];
 
+            const confirmBtn = document.createElement('button');
+
+            function updateConfirmBtn() {
+                const remaining = maxSelections - selectedPlayers.length;
+                confirmBtn.textContent = remaining > 0 ? `CONFIRM (${remaining} more)` : 'CONFIRM';
+            }
+
             othersOnly.forEach(p => {
                 const btn = document.createElement('button');
                 btn.className = 'select-btn';
@@ -1287,14 +1257,14 @@
                         btn.style.backgroundColor = '#FF0000';
                         btn.style.color = '#000000';
                     }
+                    updateConfirmBtn();
                 };
                 selectList.appendChild(btn);
             });
 
             // Add confirm button
-            const confirmBtn = document.createElement('button');
             confirmBtn.className = 'select-btn';
-            confirmBtn.textContent = `CONFIRM (${maxSelections - selectedPlayers.length} more)`;
+            updateConfirmBtn();
             confirmBtn.style.marginTop = '15px';
             confirmBtn.style.backgroundColor = '#FFFFFF';
             confirmBtn.style.color = '#000000';
@@ -1344,6 +1314,42 @@
             function showNextTimer() {
                 if (currentIndex >= multipliedResults.length) {
                     // All timers done, end turn
+                    // Apply any pending Three Man effect from rolling 3+3
+                    if (doublesRollData.pendingThreeManRoller) {
+                        const roller = doublesRollData.pendingThreeManRoller;
+                        if (doublesRollData.pendingThreeManIsCurrentThreeMan) {
+                            // They were already Three Man — show selection UI
+                            document.getElementById('prompt-title').textContent = 'ROLLED A 3!';
+                            document.getElementById('prompt-desc').innerHTML = 'PASS THE TITLE!';
+                            const selectList = document.getElementById('player-select-list');
+                            const dismissBtn = document.getElementById('dismissBtn');
+                            dismissBtn.style.display = 'none';
+                            selectList.style.display = 'flex';
+                            selectList.innerHTML = '';
+                            const threeNextRoller = nextRoller;
+                            players.forEach(p => {
+                                if (p !== roller) {
+                                    const btn = document.createElement('button');
+                                    btn.className = 'select-btn';
+                                    btn.textContent = `GIVE TO ${p}`;
+                                    btn.onclick = () => triggerThreeManTransfer(p, threeNextRoller);
+                                    selectList.appendChild(btn);
+                                }
+                            });
+                            setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
+                        } else {
+                            currentThreeMan = roller;
+                            currentPlayerIndex = nextRoller;
+                            updateHUD();
+                        }
+                        doublesRollData.pendingThreeManRoller = null;
+                        isRolling = false;
+                        document.getElementById('rollBtn').disabled = false;
+                        document.getElementById('rollBtn').textContent = "ROLL DICE";
+                        document.getElementById('dice-distribution').style.display = 'none';
+                        doublesMatchCycle = 0;
+                        return;
+                    }
                     currentPlayerIndex = nextRoller;
                     updateHUD();
                     isRolling = false;
@@ -1433,16 +1439,17 @@
             const die1 = getDieResult(diceArray[0].mesh);
             const die2 = getDieResult(diceArray[1].mesh);
             const sum = die1 + die2;
-            const doubledSum = sum * 2;
+            const multiplier = doublesMatchCycle + 2; // matches showDrinkingTimers logic
+            const penaltySum = sum * multiplier;
             const rollerName = window.penaltyRoller;
 
             const timerEl = document.getElementById('drinking-timer');
             document.getElementById('timer-player-name').textContent = rollerName;
-            document.getElementById('timer-seconds').textContent = doubledSum;
+            document.getElementById('timer-seconds').textContent = penaltySum;
 
             timerEl.classList.add('active');
 
-            let countdown = doubledSum;
+            let countdown = penaltySum;
             const interval = setInterval(() => {
                 countdown--;
                 document.getElementById('timer-seconds').textContent = countdown;
@@ -1468,11 +1475,9 @@
             currentThreeMan = newPlayerName;
             document.getElementById('action-prompt').classList.remove('active');
 
-            // Advance turn logic immediately without flash animation
             currentPlayerIndex = nextRoller;
             updateHUD();
 
-            // Unlock board
             isRolling = false;
             document.getElementById('rollBtn').disabled = false;
             document.getElementById('rollBtn').textContent = "ROLL DICE";
@@ -1486,6 +1491,43 @@
             isRolling = false;
             document.getElementById('rollBtn').disabled = false;
             document.getElementById('rollBtn').textContent = "ROLL DICE";
+        });
+
+        document.getElementById('exitToMenuBtn').addEventListener('click', () => {
+            // Reset all game state
+            players = [];
+            currentPlayerIndex = 0;
+            currentThreeMan = null;
+            nextRollerIndex = 0;
+            isRolling = false;
+            doublesMatchCycle = 0;
+            doublesRollData = {};
+
+            // Hide any open overlays
+            document.getElementById('action-prompt').classList.remove('active');
+
+            document.getElementById('drinking-timer').classList.remove('active');
+
+            // Tear down Three.js to avoid memory leaks / stale state on re-init
+            if (renderer) {
+                renderer.dispose();
+                const canvas = renderer.domElement;
+                if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+                renderer = null;
+                scene = null;
+                camera = null;
+                world = null;
+                diceArray = [];
+            }
+
+            // Return to landing page
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('wheel-screen').style.display = 'none';
+            document.getElementById('landing-page').style.display = 'flex';
+
+            // Clear player list UI
+            document.getElementById('playerList').innerHTML = '';
+            document.getElementById('playerName').value = '';
         });
 
         window.addEventListener('resize', () => {
