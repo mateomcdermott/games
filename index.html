@@ -181,7 +181,7 @@
         .hud-top {
             background-color: #000000;
             border-bottom: 4px solid #FF0000;
-            padding: 15px;
+            padding: 15px 60px 15px 15px;
             text-align: center;
             pointer-events: auto;
         }
@@ -502,6 +502,7 @@
             color: #FF0000;
             font-size: clamp(1.8rem, 8vw, 4rem);
             margin: 0;
+            padding: 0 60px;
             text-shadow: 4px 4px 0px #FFFFFF;
             text-align: center;
             line-height: 1.4;
@@ -608,24 +609,25 @@
             line-height: 1.5;
         }
 
-        /* SETTINGS HAMBURGER */
-        .hud-top {
-            position: relative;
-        }
-
+        /* GEAR BUTTON — globally fixed, always top-right */
         .hamburger-btn {
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            background: none;
-            border: 2px solid #555;
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 400;
+            background: #111;
+            border: 2px solid #333;
             color: #FFFFFF;
             font-size: 1.4rem;
-            padding: 6px 10px;
+            width: 42px;
+            height: 42px;
             line-height: 1;
             cursor: pointer;
             font-family: monospace;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .hamburger-btn:active {
@@ -640,14 +642,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.97);
+            background-color: rgba(0, 0, 0, 0.95);
             z-index: 300;
             display: none;
-            flex-direction: column;
             justify-content: center;
-            align-items: center;
-            gap: 16px;
-            padding: 40px 20px;
+            align-items: flex-start;
+            overflow-y: auto;
+            padding: 20px;
             box-sizing: border-box;
         }
 
@@ -655,48 +656,293 @@
             display: flex;
         }
 
+        .settings-content {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px 0 40px 0;
+        }
+
         #settings-overlay h2 {
             color: #FF0000;
-            font-size: 1.5rem;
-            margin: 0 0 24px 0;
+            font-size: 1.3rem;
+            margin: 0 0 10px 0;
             text-shadow: 2px 2px 0px #FFFFFF;
+            text-align: center;
+        }
+
+        .settings-divider {
+            width: 100%;
+            height: 2px;
+            background: #222;
+            margin: 6px 0;
+        }
+
+        .settings-section-label {
+            color: #555;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            padding: 4px 0 2px 0;
         }
 
         .settings-menu-btn {
-            width: 90%;
-            max-width: 400px;
-            padding: 18px 20px;
-            background-color: #000000;
+            width: 100%;
+            padding: 16px 20px;
+            background-color: #0a0a0a;
             color: #FFFFFF;
-            border: 4px solid #FF0000;
-            font-size: 1rem;
+            border: 2px solid #333;
+            font-size: 0.85rem;
             font-family: 'Press Start 2P', monospace;
             cursor: pointer;
             text-transform: uppercase;
+            text-align: left;
+            border-radius: 4px;
         }
 
         .settings-menu-btn:active {
-            background-color: #FF0000;
+            border-color: #FF0000;
+            color: #FF0000;
+        }
+
+        /* IN-SETTINGS PLAYER LIST */
+        #settings-player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .settings-player-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0a0a0a;
+            border: 2px solid #222;
+            border-radius: 4px;
+            padding: 12px 14px;
+            font-size: 0.8rem;
+        }
+
+        .settings-player-row.is-current {
+            border-color: #FF0000;
+        }
+
+        .settings-player-row.is-threeman {
+            border-color: #FFFFFF;
+        }
+
+        .settings-player-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .settings-player-name {
+            color: #FFFFFF;
+        }
+
+        .settings-player-tags {
+            display: flex;
+            gap: 6px;
+        }
+
+        .player-tag {
+            font-size: 0.55rem;
+            padding: 2px 5px;
+            border-radius: 2px;
+        }
+
+        .player-tag.current {
+            background: #FF0000;
+            color: #FFFFFF;
+        }
+
+        .player-tag.threeman {
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        .settings-remove-btn {
+            background: none;
+            border: 2px solid #444;
+            color: #FF0000;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .settings-remove-btn:active {
+            background: #FF0000;
+            color: #FFFFFF;
+        }
+
+        .settings-remove-btn:disabled {
+            color: #333;
+            border-color: #222;
+            cursor: not-allowed;
+        }
+
+        .settings-player-error {
+            color: #FF0000;
+            font-size: 0.65rem;
+            min-height: 1em;
+            padding: 2px 0;
+        }
+
+        /* ADVANCED SECTION */
+        .settings-advanced-toggle {
+            background: none;
+            border: none;
+            color: #555;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            text-align: left;
+            padding: 6px 0;
+            text-transform: uppercase;
+        }
+
+        .settings-advanced-toggle:active {
+            color: #FFFFFF;
+        }
+
+        #advanced-section {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 6px 0;
+        }
+
+        #advanced-section.open {
+            display: flex;
+        }
+
+        .advanced-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .advanced-label {
+            font-size: 0.65rem;
+            color: #888;
+            white-space: nowrap;
+        }
+
+        .advanced-toggle-group {
+            display: flex;
+            gap: 4px;
+        }
+
+        .toggle-opt {
+            background: #111;
+            border: 2px solid #333;
+            color: #555;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            padding: 7px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .toggle-opt.active {
+            background: #FF0000;
+            border-color: #FF0000;
+            color: #FFFFFF;
+        }
+
+        .toggle-opt:active {
+            background: #FF0000;
+            border-color: #FF0000;
             color: #FFFFFF;
         }
 
         .settings-close-btn {
-            width: 90%;
-            max-width: 400px;
+            width: 100%;
             padding: 14px 20px;
-            background-color: #111;
-            color: #888;
-            border: 3px solid #444;
-            font-size: 0.8rem;
+            background-color: #0a0a0a;
+            color: #444;
+            border: 2px solid #222;
+            font-size: 0.75rem;
             font-family: 'Press Start 2P', monospace;
             cursor: pointer;
             text-transform: uppercase;
-            margin-top: 10px;
+            margin-top: 6px;
+            border-radius: 4px;
         }
 
         .settings-close-btn:active {
-            background-color: #333;
             color: #FFFFFF;
+            border-color: #555;
+        }
+
+        /* GAMEPLAY SECTION */
+        #gameplay-section {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            padding: 6px 0;
+        }
+
+        #gameplay-section.open {
+            display: flex;
+        }
+
+        .gameplay-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 6px 0;
+        }
+
+        .gameplay-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .info-btn {
+            background: none;
+            border: 1px solid #444;
+            color: #555;
+            font-size: 0.75rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 0;
+            font-family: serif;
+        }
+
+        .info-btn:active, .info-btn.open {
+            border-color: #FF0000;
+            color: #FF0000;
+        }
+
+        .info-desc {
+            display: none;
+            font-size: 0.6rem;
+            color: #888;
+            line-height: 1.6;
+            padding: 6px 10px;
+            border-left: 2px solid #333;
+            margin-bottom: 6px;
+        }
+
+        .info-desc.open {
+            display: block;
         }
 
     </style>
@@ -776,7 +1022,6 @@
             <div class="hud-top">
                 <div class="three-man-banner" id="hud-threeman">THREE MAN: NONE</div>
                 <div class="turn-indicator" id="hud-turn">ROLLER: ---</div>
-                <button class="hamburger-btn" id="settingsBtn">&#9776;</button>
             </div>
             <div class="hud-bottom">
                 <button class="roll-btn" id="rollBtn">ROLL DICE</button>
@@ -805,11 +1050,150 @@
         </div>
     </div>
 
+    <button class="hamburger-btn" id="settingsBtn">&#9881;</button>
+
     <div id="settings-overlay">
-        <h2>SETTINGS</h2>
-        <button class="settings-menu-btn" id="settingsRulesBtn">VIEW RULES</button>
-        <button class="settings-menu-btn" id="settingsExitBtn">EXIT TO MENU</button>
-        <button class="settings-close-btn" id="settingsCloseBtn">CLOSE</button>
+        <div class="settings-content">
+            <h2>&#9881; SETTINGS</h2>
+
+            <button class="settings-menu-btn" id="settingsRulesBtn">VIEW RULES</button>
+            <button class="settings-menu-btn" id="settingsExitBtn">EXIT TO MENU</button>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-section-label">PLAYERS</div>
+            <div id="settings-player-list"></div>
+            <div class="settings-player-error" id="settings-player-error"></div>
+
+            <button class="settings-menu-btn" id="settingsSkipBtn">SKIP TURN</button>
+            <button class="settings-menu-btn" id="settingsResetThreeManBtn">RESET THREE MAN</button>
+
+            <div class="settings-divider"></div>
+
+            <button class="settings-advanced-toggle" id="advancedToggle">&#9660; ADVANCED</button>
+            <div id="advanced-section">
+                <div class="advanced-row">
+                    <span class="advanced-label">DICE SPEED</span>
+                    <div class="advanced-toggle-group" id="diceSpeedGroup">
+                        <button class="toggle-opt" data-val="slow">SLOW</button>
+                        <button class="toggle-opt active" data-val="normal">NORMAL</button>
+                        <button class="toggle-opt" data-val="fast">FAST</button>
+                    </div>
+                </div>
+                <div class="advanced-row">
+                    <span class="advanced-label">SOUND</span>
+                    <div class="advanced-toggle-group" id="soundGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <button class="settings-advanced-toggle" id="gameplayToggle">&#9660; GAMEPLAY</button>
+            <div id="gameplay-section">
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">DRINK TIMER</span>
+                        <button class="info-btn" data-key="drinkTimer">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="drinkTimerGroup">
+                        <button class="toggle-opt" data-val="off">OFF</button>
+                        <button class="toggle-opt active" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-drinkTimer">Skip the countdown. Players just drink at their own pace!</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">DOUBLE TROUBLE</span>
+                        <button class="info-btn" data-key="doubleTrouble">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="doubleTroubleGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-doubleTrouble">When doubles are rolled, everyone drinks instead of just the chosen players.</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">CHAIN REACTION</span>
+                        <button class="info-btn" data-key="chainReaction">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="chainReactionGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-chainReaction">Rolling 7 or 11 hits BOTH neighbors — left AND right drink.</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">HOT POTATO</span>
+                        <button class="info-btn" data-key="hotPotato">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="hotPotatoGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-hotPotato">Match the previous roller's total and they drink again!</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">IMMUNITY ROUND</span>
+                        <button class="info-btn" data-key="immunityRound">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="immunityRoundGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-immunityRound">Three Man gets 1 free block per game — they can skip one drink.</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">BOUNTY</span>
+                        <button class="info-btn" data-key="bounty">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="bountyGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-bounty">First player to make the Three Man drink 5 times steals the title.</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">REVERSE ROUND</span>
+                        <button class="info-btn" data-key="reverseRound">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="reverseRoundGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-reverseRound">7 and 11 flip — 7 hits left, 11 hits right.</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
+                        <span class="advanced-label">SOCIAL OVERLOAD</span>
+                        <button class="info-btn" data-key="socialOverload">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="socialOverloadGroup">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-socialOverload">Both 6 and 9 trigger a social — everyone drinks.</div>
+
+            </div>
+
+            <button class="settings-close-btn" id="settingsCloseBtn">CLOSE</button>
+        </div>
     </div>
 
 
@@ -1179,12 +1563,13 @@
             document.getElementById('rollBtn').disabled = true;
             document.getElementById('rollBtn').textContent = "ROLLING...";
 
+            const speedMult = diceSpeed === 'slow' ? 0.5 : diceSpeed === 'fast' ? 1.7 : 1.0;
             diceArray.forEach((die, index) => {
                 const modifier = index === 0 ? -1 : 1;
                 // Add slightly randomized drop heights so they don't sync up perfectly
                 die.body.position.set(modifier * 2 + (Math.random() - 0.5), 10 + Math.random() * 2, -3);
-                die.body.velocity.set(modifier * (Math.random() * 4), -8, Math.random() * 8);
-                die.body.angularVelocity.set(Math.random() * 15, Math.random() * 15, Math.random() * 15);
+                die.body.velocity.set(modifier * (Math.random() * 4) * speedMult, -8 * speedMult, Math.random() * 8 * speedMult);
+                die.body.angularVelocity.set(Math.random() * 15 * speedMult, Math.random() * 15 * speedMult, Math.random() * 15 * speedMult);
             });
 
             setTimeout(() => { rollCheckInterval = setInterval(checkIfAsleep, 100); }, 500);
@@ -1277,12 +1662,39 @@
                 prompts.push(`${rollerName} ROLLED A 3! NO THREE MAN YET.`);
             }
 
+            // HOT POTATO — check before updating lastRollSum
+            if (gameplay.hotPotato && lastRollSum !== null && sum === lastRollSum && lastRoller && lastRoller !== rollerName) {
+                prompts.push(`🥔 HOT POTATO! ${lastRoller} rolled ${sum} last turn — they drink again!`);
+            }
+            lastRollSum = sum;
+            lastRoller = rollerName;
+
+            // 7 / 11 (with Reverse Round support)
+            const rightIdx = (currentPlayerIndex + 1) % players.length;
+            const leftIdx = (currentPlayerIndex - 1 + players.length) % players.length;
             if (sum === 7) {
-                prompts.push(`7! ${players[(currentPlayerIndex + 1) % players.length]} (Right) drinks!`);
+                if (gameplay.chainReaction) {
+                    prompts.push(`7! CHAIN REACTION! ${players[rightIdx]} (Right) AND ${players[leftIdx]} (Left) drink!`);
+                } else if (gameplay.reverseRound) {
+                    prompts.push(`7! (REVERSED) ${players[leftIdx]} (Left) drinks!`);
+                } else {
+                    prompts.push(`7! ${players[rightIdx]} (Right) drinks!`);
+                }
             } else if (sum === 11) {
-                prompts.push(`11! ${players[(currentPlayerIndex - 1 + players.length) % players.length]} (Left) drinks!`);
+                if (gameplay.chainReaction) {
+                    prompts.push(`11! CHAIN REACTION! ${players[leftIdx]} (Left) AND ${players[rightIdx]} (Right) drink!`);
+                } else if (gameplay.reverseRound) {
+                    prompts.push(`11! (REVERSED) ${players[rightIdx]} (Right) drinks!`);
+                } else {
+                    prompts.push(`11! ${players[leftIdx]} (Left) drinks!`);
+                }
             } else if (sum === 9) {
                 prompts.push(`9! SOCIAL! Everyone drinks!`);
+            }
+
+            // SOCIAL OVERLOAD — 6 also triggers social
+            if (gameplay.socialOverload && sum === 6 && !isDoubles) {
+                prompts.push(`6! SOCIAL OVERLOAD! Everyone drinks!`);
             }
 
             if (prompts.length === 0) prompts.push("Nothing happens.");
@@ -1332,8 +1744,27 @@
 
         function showDoublesDistribution(diceValue, rollerName, nextRoller) {
             doublesRollData = { diceValue, rollerName, nextRoller };
-            doublesMatchCycle = 0; // Reset cycle counter on new doubles roll
-            
+            doublesMatchCycle = 0;
+
+            // DOUBLE TROUBLE — everyone drinks the rolled value, skip options
+            if (gameplay.doubleTrouble) {
+                const everyone = players.filter(p => p !== rollerName);
+                const results = everyone.map(p => ({ player: p, seconds: diceValue }));
+                document.getElementById('prompt-title').textContent = `DOUBLES! DOUBLE TROUBLE!`;
+                document.getElementById('prompt-desc').textContent = `Everyone drinks ${diceValue}!`;
+                document.getElementById('dismissBtn').style.display = 'none';
+                document.getElementById('player-select-list').style.display = 'none';
+                document.getElementById('dice-distribution').style.display = 'none';
+                setTimeout(() => {
+                    document.getElementById('action-prompt').classList.add('active');
+                    setTimeout(() => {
+                        document.getElementById('action-prompt').classList.remove('active');
+                        showDrinkingTimers(results, nextRoller, 'double-trouble');
+                    }, 1500);
+                }, 300);
+                return;
+            }
+
             const distDiv = document.getElementById('dice-distribution');
             distDiv.style.display = 'flex';
             distDiv.innerHTML = '';
@@ -1490,18 +1921,70 @@
                     return;
                 }
 
-                const { player, seconds } = multipliedResults[currentIndex];
+                let { player, seconds } = multipliedResults[currentIndex];
                 const timerEl = document.getElementById('drinking-timer');
+
+                // IMMUNITY ROUND — Three Man can block one drink
+                if (gameplay.immunityRound && !immunityUsed && player === currentThreeMan) {
+                    immunityUsed = true;
+                    document.getElementById('timer-player-name').textContent = `${player} (THREE MAN)`;
+                    document.getElementById('timer-seconds').textContent = '🛡';
+                    timerEl.querySelector('.timer-instruction').textContent = 'IMMUNITY USED! NO DRINK THIS TIME.';
+                    timerEl.classList.add('active');
+                    setTimeout(() => {
+                        timerEl.classList.remove('active');
+                        timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
+                        currentIndex++;
+                        setTimeout(showNextTimer, 500);
+                    }, 2500);
+                    return;
+                }
+
+                // BOUNTY — track drinks forced on Three Man
+                if (gameplay.bounty && player === currentThreeMan) {
+                    threeManDrinkCount++;
+                    if (threeManDrinkCount >= 5) {
+                        // Find who last triggered this drink (the current roller)
+                        const thief = players[currentPlayerIndex];
+                        threeManDrinkCount = 0;
+                        // Show bounty message then steal title
+                        document.getElementById('timer-player-name').textContent = `BOUNTY CLAIMED!`;
+                        document.getElementById('timer-seconds').textContent = '👑';
+                        timerEl.querySelector('.timer-instruction').textContent = `${thief} STEALS THE THREE MAN TITLE!`;
+                        timerEl.classList.add('active');
+                        setTimeout(() => {
+                            timerEl.classList.remove('active');
+                            timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
+                            currentThreeMan = thief;
+                            updateHUD();
+                            currentIndex++;
+                            setTimeout(showNextTimer, 500);
+                        }, 3000);
+                        return;
+                    }
+                }
+
                 document.getElementById('timer-player-name').textContent = player;
                 document.getElementById('timer-seconds').textContent = seconds;
+                timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
+
+                // DRINK TIMER OFF — skip countdown, just flash briefly
+                if (!gameplay.drinkTimer) {
+                    timerEl.querySelector('.timer-seconds') && (document.getElementById('timer-seconds').textContent = 'DRINK!');
+                    timerEl.classList.add('active');
+                    setTimeout(() => {
+                        timerEl.classList.remove('active');
+                        currentIndex++;
+                        setTimeout(showNextTimer, 300);
+                    }, 1500);
+                    return;
+                }
 
                 timerEl.classList.add('active');
-
                 let countdown = seconds;
                 const interval = setInterval(() => {
                     countdown--;
                     document.getElementById('timer-seconds').textContent = countdown;
-                    
                     if (countdown < 0) {
                         clearInterval(interval);
                         currentIndex++;
@@ -1536,11 +2019,12 @@
 
         function rerrollDoublesWithPenalty(nextRoller) {
             // Manually trigger a re-roll for the original roller
+            const speedMult = diceSpeed === 'slow' ? 0.5 : diceSpeed === 'fast' ? 1.7 : 1.0;
             diceArray.forEach((die, index) => {
                 const modifier = index === 0 ? -1 : 1;
                 die.body.position.set(modifier * 2 + (Math.random() - 0.5), 10 + Math.random() * 2, -3);
-                die.body.velocity.set(modifier * (Math.random() * 5), -10, Math.random() * 10);
-                die.body.angularVelocity.set(Math.random() * 20, Math.random() * 20, Math.random() * 20);
+                die.body.velocity.set(modifier * (Math.random() * 5) * speedMult, -10 * speedMult, Math.random() * 10 * speedMult);
+                die.body.angularVelocity.set(Math.random() * 20 * speedMult, Math.random() * 20 * speedMult, Math.random() * 20 * speedMult);
             });
 
             setTimeout(() => { 
@@ -1575,27 +2059,35 @@
 
             const timerEl = document.getElementById('drinking-timer');
             document.getElementById('timer-player-name').textContent = rollerName;
+            timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
+
+            function endPenaltyTurn() {
+                timerEl.classList.remove('active');
+                currentPlayerIndex = window.penaltyNextRoller;
+                updateHUD();
+                isRolling = false;
+                document.getElementById('rollBtn').disabled = false;
+                document.getElementById('rollBtn').textContent = "ROLL DICE";
+                document.getElementById('dice-distribution').style.display = 'none';
+                window.penaltyRollActive = false;
+            }
+
+            if (!gameplay.drinkTimer) {
+                document.getElementById('timer-seconds').textContent = 'DRINK!';
+                timerEl.classList.add('active');
+                setTimeout(endPenaltyTurn, 1500);
+                return;
+            }
+
             document.getElementById('timer-seconds').textContent = penaltySum;
-
             timerEl.classList.add('active');
-
             let countdown = penaltySum;
             const interval = setInterval(() => {
                 countdown--;
                 document.getElementById('timer-seconds').textContent = countdown;
-                
                 if (countdown < 0) {
                     clearInterval(interval);
-                    timerEl.classList.remove('active');
-                    
-                    // End the turn
-                    currentPlayerIndex = window.penaltyNextRoller;
-                    updateHUD();
-                    isRolling = false;
-                    document.getElementById('rollBtn').disabled = false;
-                    document.getElementById('rollBtn').textContent = "ROLL DICE";
-                    document.getElementById('dice-distribution').style.display = 'none';
-                    window.penaltyRollActive = false;
+                    endPenaltyTurn();
                 }
             }, 1000);
         }
@@ -1632,6 +2124,10 @@
             isRolling = false;
             doublesMatchCycle = 0;
             doublesRollData = {};
+            lastRollSum = null;
+            lastRoller = null;
+            immunityUsed = false;
+            threeManDrinkCount = 0;
 
             // Hide any open overlays
             document.getElementById('action-prompt').classList.remove('active');
@@ -1664,23 +2160,225 @@
         // SETTINGS MENU
         // ==========================================
         const settingsOverlay = document.getElementById('settings-overlay');
+        let diceSpeed = 'normal'; // 'slow' | 'normal' | 'fast'
+
+        // Gameplay settings
+        const gameplay = {
+            drinkTimer: true,
+            doubleTrouble: false,
+            chainReaction: false,
+            hotPotato: false,
+            immunityRound: false,
+            bounty: false,
+            reverseRound: false,
+            socialOverload: false,
+        };
+        let immunityUsed = false;        // tracks if Three Man has used their block
+        let threeManDrinkCount = 0;      // tracks drinks forced on Three Man (bounty)
+        let lastRollSum = null;          // tracks previous roll sum (hot potato)
+        let lastRoller = null;           // tracks who rolled it (hot potato)
+
+        function closeSettings() {
+            settingsOverlay.classList.remove('active');
+        }
+
+        function renderSettingsPlayerList() {
+            const container = document.getElementById('settings-player-list');
+            const errorEl = document.getElementById('settings-player-error');
+            container.innerHTML = '';
+            errorEl.textContent = '';
+
+            // Only show player list if game is active (game-screen visible)
+            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            if (!gameActive) {
+                container.style.display = 'none';
+                document.getElementById('settings-player-list').previousElementSibling.style.display = 'none'; // section label
+                return;
+            }
+            container.style.display = 'flex';
+
+            players.forEach((name, i) => {
+                const row = document.createElement('div');
+                row.className = 'settings-player-row';
+                const isCurrent = i === currentPlayerIndex;
+                const isThreeMan = name === currentThreeMan;
+                if (isCurrent) row.classList.add('is-current');
+                if (isThreeMan) row.classList.add('is-threeman');
+
+                const meta = document.createElement('div');
+                meta.className = 'settings-player-meta';
+
+                const nameEl = document.createElement('div');
+                nameEl.className = 'settings-player-name';
+                nameEl.textContent = `${i + 1}. ${name}`;
+                meta.appendChild(nameEl);
+
+                if (isCurrent || isThreeMan) {
+                    const tags = document.createElement('div');
+                    tags.className = 'settings-player-tags';
+                    if (isCurrent) {
+                        const t = document.createElement('span');
+                        t.className = 'player-tag current';
+                        t.textContent = 'ROLLING';
+                        tags.appendChild(t);
+                    }
+                    if (isThreeMan) {
+                        const t = document.createElement('span');
+                        t.className = 'player-tag threeman';
+                        t.textContent = 'THREE MAN';
+                        tags.appendChild(t);
+                    }
+                    meta.appendChild(tags);
+                }
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'settings-remove-btn';
+                removeBtn.textContent = 'REMOVE';
+                const tooFew = players.length <= 3;
+                if (tooFew) {
+                    removeBtn.disabled = true;
+                    removeBtn.title = 'NEED AT LEAST 3 PLAYERS';
+                } else {
+                    removeBtn.onclick = () => {
+                        if (players.length <= 3) {
+                            errorEl.textContent = 'NEED AT LEAST 3 PLAYERS!';
+                            setTimeout(() => { errorEl.textContent = ''; }, 2500);
+                            return;
+                        }
+                        // If removing Three Man, clear title
+                        if (name === currentThreeMan) currentThreeMan = null;
+                        // If removing current roller, keep index valid
+                        players.splice(i, 1);
+                        if (currentPlayerIndex >= players.length) currentPlayerIndex = 0;
+                        if (nextRollerIndex >= players.length) nextRollerIndex = 0;
+                        updateHUD();
+                        renderSettingsPlayerList();
+                    };
+                }
+
+                row.appendChild(meta);
+                row.appendChild(removeBtn);
+                container.appendChild(row);
+            });
+        }
 
         document.getElementById('settingsBtn').addEventListener('click', () => {
+            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            // Show/hide game-only options
+            document.getElementById('settingsSkipBtn').style.display = gameActive ? '' : 'none';
+            document.getElementById('settingsResetThreeManBtn').style.display = gameActive ? '' : 'none';
+            document.querySelector('.settings-section-label').style.display = gameActive ? '' : 'none';
+            renderSettingsPlayerList();
             settingsOverlay.classList.add('active');
         });
 
-        document.getElementById('settingsCloseBtn').addEventListener('click', () => {
-            settingsOverlay.classList.remove('active');
-        });
+        document.getElementById('settingsCloseBtn').addEventListener('click', closeSettings);
 
         document.getElementById('settingsRulesBtn').addEventListener('click', () => {
-            settingsOverlay.classList.remove('active');
+            closeSettings();
             document.getElementById('rules-modal').classList.add('active');
         });
 
         document.getElementById('settingsExitBtn').addEventListener('click', () => {
-            settingsOverlay.classList.remove('active');
+            closeSettings();
             document.getElementById('exitToMenuBtn').click();
+        });
+
+        document.getElementById('settingsSkipBtn').addEventListener('click', () => {
+            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            if (!gameActive) return;
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            nextRollerIndex = currentPlayerIndex;
+            updateHUD();
+            // Close action prompt if open
+            document.getElementById('action-prompt').classList.remove('active');
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('rollBtn').textContent = 'ROLL DICE';
+            isRolling = false;
+            closeSettings();
+        });
+
+        document.getElementById('settingsResetThreeManBtn').addEventListener('click', () => {
+            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            if (!gameActive) return;
+            currentThreeMan = null;
+            updateHUD();
+            closeSettings();
+        });
+
+        // Advanced toggle
+        document.getElementById('advancedToggle').addEventListener('click', () => {
+            const section = document.getElementById('advanced-section');
+            const btn = document.getElementById('advancedToggle');
+            const open = section.classList.toggle('open');
+            btn.textContent = (open ? '▲' : '▼') + ' ADVANCED';
+        });
+
+        // Dice speed toggle
+        document.getElementById('diceSpeedGroup').addEventListener('click', (e) => {
+            const btn = e.target.closest('.toggle-opt');
+            if (!btn) return;
+            diceSpeed = btn.dataset.val;
+            document.querySelectorAll('#diceSpeedGroup .toggle-opt').forEach(b => b.classList.toggle('active', b === btn));
+        });
+
+        // Sound toggle (placeholder)
+        document.getElementById('soundGroup').addEventListener('click', (e) => {
+            const btn = e.target.closest('.toggle-opt');
+            if (!btn) return;
+            document.querySelectorAll('#soundGroup .toggle-opt').forEach(b => b.classList.toggle('active', b === btn));
+        });
+
+        // Gameplay section toggle
+        document.getElementById('gameplayToggle').addEventListener('click', () => {
+            const section = document.getElementById('gameplay-section');
+            const btn = document.getElementById('gameplayToggle');
+            const open = section.classList.toggle('open');
+            btn.textContent = (open ? '▲' : '▼') + ' GAMEPLAY';
+        });
+
+        // Info buttons — toggle description inline
+        document.getElementById('gameplay-section').addEventListener('click', (e) => {
+            const infoBtn = e.target.closest('.info-btn');
+            if (infoBtn) {
+                const key = infoBtn.dataset.key;
+                const descEl = document.getElementById(`info-${key}`);
+                const isOpen = descEl.classList.toggle('open');
+                infoBtn.classList.toggle('open', isOpen);
+                return;
+            }
+
+            // Toggle opt buttons in gameplay section
+            const toggleBtn = e.target.closest('.toggle-opt');
+            if (toggleBtn) {
+                const group = toggleBtn.closest('.advanced-toggle-group');
+                if (!group) return;
+                const groupId = group.id;
+                const val = toggleBtn.dataset.val;
+                group.querySelectorAll('.toggle-opt').forEach(b => b.classList.toggle('active', b === toggleBtn));
+
+                // Map group ID to gameplay key
+                const keyMap = {
+                    drinkTimerGroup: 'drinkTimer',
+                    doubleTroubleGroup: 'doubleTrouble',
+                    chainReactionGroup: 'chainReaction',
+                    hotPotatoGroup: 'hotPotato',
+                    immunityRoundGroup: 'immunityRound',
+                    bountyGroup: 'bounty',
+                    reverseRoundGroup: 'reverseRound',
+                    socialOverloadGroup: 'socialOverload',
+                };
+                const key = keyMap[groupId];
+                if (key) {
+                    gameplay[key] = (val === 'on' || val === 'true' || val === true);
+                    // Special: drinkTimer ON = true
+                    if (key === 'drinkTimer') gameplay[key] = (val === 'on');
+                    // Reset immunity used when toggled
+                    if (key === 'immunityRound') immunityUsed = false;
+                    // Reset bounty count when toggled
+                    if (key === 'bounty') threeManDrinkCount = 0;
+                }
+            }
         });
 
         window.addEventListener('resize', () => {
