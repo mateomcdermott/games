@@ -646,12 +646,6 @@
 
         /* --- WHEEL SCREEN ANIMATIONS --- */
 
-        /* Glow pulse while spinning */
-        @keyframes wheelSpinGlow {
-            0%, 100% { box-shadow: 0 0 30px #FF0000; }
-            50%       { box-shadow: 0 0 80px #FF0000, 0 0 130px #FF000055; }
-        }
-        #spin-wheel.spinning { animation: wheelSpinGlow 0.5s ease-in-out infinite; }
 
 
 
@@ -1543,6 +1537,18 @@
 
                 <div class="gameplay-row">
                     <div class="gameplay-left">
+                        <span class="advanced-label">SOCIAL 9</span>
+                        <button class="info-btn" data-key="social9">&#8505;</button>
+                    </div>
+                    <div class="advanced-toggle-group" id="social9Group">
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
+                    </div>
+                </div>
+                <div class="info-desc" id="info-social9">Rolling a 9 makes everyone drink.</div>
+
+                <div class="gameplay-row">
+                    <div class="gameplay-left">
                         <span class="advanced-label">SOCIAL OVERLOAD</span>
                         <button class="info-btn" data-key="socialOverload">&#8505;</button>
                     </div>
@@ -1896,7 +1902,7 @@
             resultEl.classList.remove('slam');
 
             // Reset wheel and pointer classes
-            wheel.classList.remove('spinning', 'winner');
+            wheel.classList.remove('winner');
             document.querySelector('.wheel-pointer-bottom').classList.remove();
 
             isSpinning = false;
@@ -1930,8 +1936,7 @@
             const numPlayers = players.length;
             const segmentAngle = 360 / numPlayers;
 
-            // Start spinning animations
-            wheel.classList.add('spinning');
+            // Start spinning
 
             // Select a random winning player
             const winningPlayerIndex = Math.floor(Math.random() * numPlayers);
@@ -1953,8 +1958,7 @@
                 currentPlayerIndex = winningPlayerIndex;
                 isSpinning = false;
 
-                // Stop spinning glow, start winner pulse
-                wheel.classList.remove('spinning');
+                // Winner pulse
                 wheel.classList.add('winner');
                 setTimeout(() => wheel.classList.remove('winner'), 2000);
 
@@ -2254,7 +2258,7 @@
                 } else {
                     prompts.push(`11! ${players[leftIdx]} (Left) drinks!`);
                 }
-            } else if (sum === 9) {
+            } else if (sum === 9 && gameplay.social9) {
                 prompts.push(`9! SOCIAL! Everyone drinks!`);
             }
 
@@ -2749,6 +2753,7 @@
             immunityRound: false,
             bounty: false,
             reverseRound: false,
+            social9: false,
             socialOverload: false,
         };
         let immunityUsed = false;        // tracks if Three Man has used their block
@@ -2961,6 +2966,7 @@
                     immunityRoundGroup: 'immunityRound',
                     bountyGroup: 'bounty',
                     reverseRoundGroup: 'reverseRound',
+                    social9Group: 'social9',
                     socialOverloadGroup: 'socialOverload',
                 };
                 const key = keyMap[groupId];
