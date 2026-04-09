@@ -392,18 +392,44 @@
         }
 
         .rules-content h3 {
-            color: #FFFFFF;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            margin-bottom: 10px;
+            color: #FF0000;
+            font-size: 0.85rem;
+            margin-top: 32px;
+            margin-bottom: 14px;
             border-bottom: 2px dashed #FF0000;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
+            letter-spacing: 2px;
         }
 
         .rules-content p {
-            font-size: 0.75rem;
-            line-height: 1.6;
-            margin: 8px 0;
+            font-size: 0.7rem;
+            line-height: 1.9;
+            margin: 12px 0;
+            color: #DDDDDD;
+        }
+
+        .rules-content p + p {
+            margin-top: 14px;
+        }
+
+        .rules-rule {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin: 14px 0;
+            font-size: 0.7rem;
+            line-height: 1.9;
+            color: #DDDDDD;
+        }
+
+        .rules-rule-icon {
+            color: #FF0000;
+            flex-shrink: 0;
+            min-width: 16px;
+        }
+
+        .rules-content strong {
+            color: #FFFFFF;
         }
 
         .close-rules-btn {
@@ -1294,36 +1320,44 @@
     <div id="rules-modal">
         <div class="rules-content">
             <h2>GAME RULES</h2>
-            
-            <h3>THREE MAN TITLE</h3>
-            <p>The Three Man is decided at the start of the game by the spinner wheel.</p>
-            <p>If anyone (who is NOT the Three Man) rolls a 3 on any die, the Three Man takes a sip. The roller then rolls again.</p>
-            <p>If the roller gets doubles that include a 3 (e.g. 3+3), the Three Man takes TWO sips.</p>
-            <p>The Three Man title only switches when the Three Man themselves rolls a 3. They choose who gets the title next.</p>
-            <p>If the Three Man rolls double 3s, they FIRST pass the title, THEN choose how to distribute the dice (Option 1 or 2).</p>
+
+            <h3>THE THREE MAN</h3>
+
+            <p>The Three Man is chosen at the start by the spin wheel.</p>
+
+            <div class="rules-rule"><span class="rules-rule-icon">▸</span><span>Anyone (not the Three Man) rolls a <strong>3 on any die</strong> or a <strong>sum of 3</strong> — the Three Man takes a sip. The roller goes again.</span></div>
+
+            <div class="rules-rule"><span class="rules-rule-icon">▸</span><span>Roller gets <strong>doubles including a 3</strong> (e.g. 3+3) — the Three Man takes <strong>TWO sips</strong>.</span></div>
+
+            <div class="rules-rule"><span class="rules-rule-icon">▸</span><span>The Three Man rolls a <strong>3</strong> — they choose who gets the title next (or keep it).</span></div>
+
+            <div class="rules-rule"><span class="rules-rule-icon">▸</span><span>The Three Man rolls <strong>double 3s</strong> — they MUST pass the title first, then distribute the dice.</span></div>
 
             <h3>DOUBLES</h3>
-            <p>Roll the same number twice? You have two options:</p>
-            <p><strong>Option 1:</strong> Pass 1 die to 2 people. Each rolls and drinks for their result.</p>
-            <p><strong>Option 2:</strong> Pass both dice to 1 person. They roll and drink for the sum.</p>
-            <p><strong>THE CYCLE:</strong> If the 2 people who received dice both roll the SAME number, they escape drinking! Dice go back to you.</p>
-            <p>You roll again, and if they match again, the multiplier increases:<br>
-            • 1st match: 3x multiplier<br>
-            • 2nd match: 4x multiplier<br>
-            • 3rd match: 5x multiplier (and so on...)</p>
-            <p>Each match continues the cycle. When they finally roll different numbers, they drink their individual roll × current multiplier!</p>
 
-            <h3>LUCKY 7</h3>
-            <p>Rolled a 7? The player to your RIGHT drinks.</p>
+            <p>Roll the same number twice? Pick one:</p>
 
-            <h3>ELEVEN</h3>
-            <p>Rolled an 11? The player to your LEFT drinks.</p>
+            <div class="rules-rule"><span class="rules-rule-icon">1</span><span>Pass <strong>1 die to 2 people</strong> — each rolls and drinks their result.</span></div>
 
-            <h3>SOCIAL 9</h3>
-            <p>Rolled a 9? EVERYONE drinks!</p>
+            <div class="rules-rule"><span class="rules-rule-icon">2</span><span>Pass <strong>both dice to 1 person</strong> — they roll and drink the sum.</span></div>
+
+            <p><strong>THE CYCLE</strong> — If the recipients both roll the same number, they escape! Dice return to you. If they match again, the multiplier grows:</p>
+
+            <div class="rules-rule"><span class="rules-rule-icon">▸</span><span>1st match — <strong>3×</strong></span></div>
+            <div class="rules-rule"><span class="rules-rule-icon">▸</span><span>2nd match — <strong>4×</strong></span></div>
+            <div class="rules-rule"><span class="rules-rule-icon">▸</span><span>3rd match — <strong>5×</strong> (and up)</span></div>
+
+            <p>When they finally roll different numbers, each drinks their roll × the current multiplier.</p>
+
+            <h3>SPECIAL ROLLS</h3>
+
+            <div class="rules-rule"><span class="rules-rule-icon">7</span><span>Player to your <strong>RIGHT</strong> drinks.</span></div>
+            <div class="rules-rule"><span class="rules-rule-icon">9</span><span><strong>EVERYONE</strong> drinks.</span></div>
+            <div class="rules-rule"><span class="rules-rule-icon">11</span><span>Player to your <strong>LEFT</strong> drinks.</span></div>
 
             <h3>ANYTHING ELSE</h3>
-            <p>Nothing special happens. Turn passes to the next player.</p>
+
+            <p>Nothing happens. Turn passes to the next player.</p>
 
             <button class="close-rules-btn" id="closeRulesBtn">CLOSE</button>
         </div>
@@ -2126,7 +2160,7 @@
             let passTurn = true;
             let showThreeManSelection = false;
 
-            const isThreeRolled = (die1 === 3 || die2 === 3);
+            const isThreeRolled = (die1 === 3 || die2 === 3 || sum === 3);
             const isDoubles = (die1 === die2);
 
             // RULE 4: Action Rolls — handle doubles first
