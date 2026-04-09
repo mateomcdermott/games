@@ -527,7 +527,7 @@
             justify-content: space-evenly;
             align-items: center;
             background-color: #000000;
-            padding: 30px 20px;
+            padding: 16px 20px;
             box-sizing: border-box;
             position: relative;
             z-index: 100;
@@ -535,12 +535,12 @@
 
         #wheel-screen h2 {
             color: #FF0000;
-            font-size: clamp(1.8rem, 8vw, 4rem);
+            font-size: clamp(0.85rem, 4.5vw, 1.4rem);
             margin: 0;
-            padding: 0 60px;
-            text-shadow: 4px 4px 0px #FFFFFF;
+            padding: 0 20px;
+            text-shadow: 2px 2px 0px #FFFFFF;
             text-align: center;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         .current-three-man-display {
@@ -558,8 +558,8 @@
 
         .wheel-container {
             position: relative;
-            width: min(75vw, 75vh, 420px);
-            height: min(75vw, 75vh, 420px);
+            width: min(82vw, 52vh, 420px);
+            height: min(82vw, 52vh, 420px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -575,11 +575,11 @@
 
         .wheel-pointer-bottom {
             position: absolute;
-            right: -58px;
+            right: -42px;
             top: 50%;
             transform: translateY(-50%);
-            width: 54px;
-            height: 54px;
+            width: 40px;
+            height: 40px;
             z-index: 10;
         }
 
@@ -588,9 +588,9 @@
             position: absolute;
             width: 0;
             height: 0;
-            border-top: 27px solid transparent;
-            border-bottom: 27px solid transparent;
-            border-right: 50px solid #FFFFFF;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-right: 38px solid #FFFFFF;
             top: 50%;
             right: 0;
             transform: translateY(-50%);
@@ -601,9 +601,9 @@
             position: absolute;
             width: 0;
             height: 0;
-            border-top: 23px solid transparent;
-            border-bottom: 23px solid transparent;
-            border-right: 44px solid #FF0000;
+            border-top: 16px solid transparent;
+            border-bottom: 16px solid transparent;
+            border-right: 32px solid #FF0000;
             top: 50%;
             right: 0;
             transform: translateY(-50%);
@@ -612,9 +612,9 @@
         .spin-btn {
             background-color: #FF0000;
             color: #FFFFFF;
-            border: 6px solid #FFFFFF;
-            padding: clamp(18px, 4vw, 28px) clamp(20px, 5vw, 40px);
-            font-size: clamp(1.1rem, 5vw, 1.8rem);
+            border: 4px solid #FFFFFF;
+            padding: clamp(12px, 3vw, 20px) clamp(16px, 4vw, 32px);
+            font-size: clamp(0.9rem, 4vw, 1.4rem);
             font-family: 'Press Start 2P', monospace;
             width: 90%;
             max-width: 500px;
@@ -637,11 +637,11 @@
 
         .wheel-result {
             color: #FF0000;
-            font-size: clamp(1.8rem, 9vw, 3.5rem);
+            font-size: clamp(1rem, 5.5vw, 2rem);
             text-align: center;
-            text-shadow: 3px 3px 0px #FFFFFF;
-            min-height: 2em;
-            line-height: 1.5;
+            text-shadow: 2px 2px 0px #FFFFFF;
+            min-height: 2.4em;
+            line-height: 1.4;
         }
 
         /* --- WHEEL SCREEN ANIMATIONS --- */
