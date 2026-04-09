@@ -2163,6 +2163,7 @@
             let prompts = [];
             let passTurn = true;
             let showThreeManSelection = false;
+            let assignNewThreeMan = false;
 
             const isThreeRolled = (die1 === 3 || die2 === 3 || sum === 3);
             const isDoubles = (die1 === die2);
@@ -2227,9 +2228,10 @@
                 prompts.push(`${rollerName} ROLLED A 3! ${currentThreeMan} (THREE MAN) TAKES A SIP!`);
                 showThreeManDrinkAnim(currentThreeMan, 1);
             }
-            // RULE 2b: If no Three Man yet and someone rolls a 3, nothing special
+            // RULE 2b: No Three Man — roller picks who gets the title
             else if (isThreeRolled) {
-                prompts.push(`${rollerName} ROLLED A 3! NO THREE MAN YET.`);
+                prompts.push(`${rollerName} ROLLED A 3! PICK THE NEW THREE MAN!`);
+                assignNewThreeMan = true;
             }
 
             // HOT POTATO — check before updating lastRollSum
@@ -2304,6 +2306,18 @@
                         btn.onclick = () => triggerThreeManTransfer(p, nextRollerIndex);
                         selectList.appendChild(btn);
                     }
+                });
+            } else if (assignNewThreeMan) {
+                dismissBtn.style.display = 'none';
+                selectList.style.display = 'flex';
+                selectList.innerHTML = '';
+
+                players.forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.className = 'select-btn';
+                    btn.textContent = `${p} IS THE THREE MAN`;
+                    btn.onclick = () => triggerThreeManTransfer(p, nextRollerIndex);
+                    selectList.appendChild(btn);
                 });
             } else {
                 dismissBtn.style.display = 'block';
