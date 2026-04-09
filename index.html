@@ -56,6 +56,15 @@
             margin-bottom: 40px;
         }
 
+        .landing-credit {
+            font-size: 0.5rem;
+            color: #444;
+            text-align: center;
+            padding: 16px 0 24px 0;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
         .container {
             width: 100%;
             max-width: 400px;
@@ -945,6 +954,120 @@
             display: block;
         }
 
+        /* --- LANDING PAGE ANIMATIONS --- */
+
+        /* Floating dice background */
+        #dice-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .dice-float {
+            position: absolute;
+            opacity: 0;
+            animation: diceFloat linear infinite;
+            user-select: none;
+            will-change: transform;
+        }
+        @keyframes diceFloat {
+            0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
+            8%   { opacity: 0.09; }
+            92%  { opacity: 0.09; }
+            100% { transform: translateY(-15vh) rotate(270deg); opacity: 0; }
+        }
+
+        /* Player list entrance */
+        @keyframes playerSlideIn {
+            from { transform: translateX(-16px) scale(0.96); opacity: 0; }
+            to   { transform: translateX(0)     scale(1);    opacity: 1; }
+        }
+        .player-list li {
+            animation: playerSlideIn 0.22s ease-out both;
+        }
+
+        /* --- INTRO SEQUENCE --- */
+        #intro-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        #intro-text {
+            font-family: 'Press Start 2P', monospace;
+            text-align: center;
+            padding: 20px;
+            line-height: 1.6;
+            max-width: 90vw;
+        }
+        #intro-text.intro-small  { font-size: clamp(0.75rem, 3vw, 1rem);      color: #FFFFFF; }
+        #intro-text.intro-medium { font-size: clamp(0.9rem,  4vw, 1.3rem);   color: #FFFFFF; }
+        #intro-text.intro-big    { font-size: clamp(2rem,    9vw, 3.5rem);   color: #FFFFFF; }
+        #intro-text.intro-title  { font-size: clamp(3rem,   14vw, 5.5rem);   color: #FF0000; text-shadow: 5px 5px 0px #FFFFFF; }
+        @keyframes introPop {
+            0%   { transform: scale(1.14); opacity: 0; }
+            100% { transform: scale(1);    opacity: 1; }
+        }
+        #intro-text.popping { animation: introPop 0.12s ease-out both; }
+
+        /* Glitch effect on title */
+        h1 { position: relative; }
+        h1::before,
+        h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+        h1.glitching::before {
+            color: #FF0000;
+            text-shadow: none;
+            opacity: 1;
+            animation: glitchRed 0.35s steps(2) both;
+        }
+        h1.glitching::after {
+            color: #FFFFFF;
+            text-shadow: none;
+            opacity: 1;
+            animation: glitchWhite 0.35s steps(2) both;
+        }
+        @keyframes glitchRed {
+            0%   { clip-path: inset(5% 0 85% 0);  transform: translateX(-6px); }
+            25%  { clip-path: inset(35% 0 45% 0); transform: translateX(5px); }
+            50%  { clip-path: inset(60% 0 15% 0); transform: translateX(-4px); }
+            75%  { clip-path: inset(20% 0 65% 0); transform: translateX(6px); }
+            100% { clip-path: inset(0 0 100% 0);  transform: translateX(0); opacity: 0; }
+        }
+        @keyframes glitchWhite {
+            0%   { clip-path: inset(75% 0 5% 0);  transform: translateX(5px); }
+            25%  { clip-path: inset(50% 0 30% 0); transform: translateX(-6px); }
+            50%  { clip-path: inset(15% 0 70% 0); transform: translateX(4px); }
+            75%  { clip-path: inset(85% 0 5% 0);  transform: translateX(-5px); }
+            100% { clip-path: inset(0 0 100% 0);  transform: translateX(0); opacity: 0; }
+        }
+
+        /* Start button shake */
+        @keyframes btnShake {
+            0%, 100% { transform: translateX(0); }
+            15%      { transform: translateX(-7px); }
+            30%      { transform: translateX(7px); }
+            45%      { transform: translateX(-5px); }
+            60%      { transform: translateX(5px); }
+            75%      { transform: translateX(-3px); }
+            90%      { transform: translateX(3px); }
+        }
+        .start-btn.shaking { animation: btnShake 0.4s ease-in-out; }
+
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -953,8 +1076,13 @@
 
 <body>
 
+    <div id="intro-overlay">
+        <div id="intro-text"></div>
+    </div>
+
     <div id="landing-page">
-        <h1>THREE<br>MAN</h1>
+        <div id="dice-bg"></div>
+        <h1 data-text="THREE MAN">THREE<br>MAN</h1>
         <p class="subtitle">A DICE & DRINK GAME</p>
         <div class="container">
             <input type="text" id="playerName" placeholder="ENTER NAME" autocomplete="off" maxlength="7">
@@ -964,6 +1092,7 @@
             <button class="rules-btn" id="rulesBtn">VIEW RULES</button>
             <button class="start-btn" id="startGameBtn">START GAME</button>
         </div>
+        <p class="landing-credit">© 2026 Mateo McDermott</p>
     </div>
 
     <div id="rules-modal">
@@ -1219,6 +1348,7 @@
             playerListEl.innerHTML = '';
             players.forEach((p, i) => {
                 const li = document.createElement('li');
+                li.style.animationDelay = `${i * 0.06}s`;
                 const nameSpan = document.createElement('span');
                 nameSpan.textContent = `${i + 1}. ${p}`;
                 const removeBtn = document.createElement('button');
@@ -1246,6 +1376,33 @@
             renderPlayerList();
         }
 
+        // Spawn floating dice in landing page background
+        (function spawnDiceBackground() {
+            const bg = document.getElementById('dice-bg');
+            const faces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+            for (let i = 0; i < 18; i++) {
+                const die = document.createElement('span');
+                die.className = 'dice-float';
+                die.textContent = faces[Math.floor(Math.random() * faces.length)];
+                const size = 1.4 + Math.random() * 2.2;
+                const duration = 14 + Math.random() * 18;
+                const delay = -Math.random() * duration; // start mid-cycle so screen fills immediately
+                die.style.cssText = `left:${Math.random() * 100}%;top:0;font-size:${size}rem;animation-duration:${duration}s;animation-delay:${delay}s;`;
+                bg.appendChild(die);
+            }
+        })();
+
+        // Glitch the title on load, then randomly every 8–15s
+        (function initTitleGlitch() {
+            const h1 = document.querySelector('#landing-page h1');
+            function glitch() {
+                h1.classList.add('glitching');
+                setTimeout(() => h1.classList.remove('glitching'), 400);
+                setTimeout(glitch, 8000 + Math.random() * 7000);
+            }
+            setTimeout(glitch, 1200);
+        })();
+
         document.getElementById('addPlayerBtn').addEventListener('click', addPlayer);
         nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPlayer(); });
         document.getElementById('rulesBtn').addEventListener('click', () => {
@@ -1256,9 +1413,16 @@
         });
         document.getElementById('startGameBtn').addEventListener('click', () => {
             if (players.length < 2) return showError("NEED AT LEAST 2 PLAYERS!");
-            document.getElementById('landing-page').style.display = 'none';
-            document.getElementById('wheel-screen').style.display = 'flex';
-            initWheelScreen();
+
+            // Shake the button then transition
+            const startBtn = document.getElementById('startGameBtn');
+            startBtn.classList.add('shaking');
+            startBtn.addEventListener('animationend', () => {
+                startBtn.classList.remove('shaking');
+                document.getElementById('landing-page').style.display = 'none';
+                document.getElementById('wheel-screen').style.display = 'flex';
+                initWheelScreen();
+            }, { once: true });
         });
 
         function updateHUD() {
@@ -2388,6 +2552,82 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
             }
         });
+
+        // ==========================================
+        // INTRO SEQUENCE (plays once per page load)
+        // ==========================================
+        (function runIntroSequence() {
+            const overlay = document.getElementById('intro-overlay');
+            const textEl  = document.getElementById('intro-text');
+            let done = false;
+
+            function finish() {
+                if (done) return;
+                done = true;
+                overlay.style.display = 'none';
+            }
+
+            overlay.addEventListener('click', finish);
+
+            const frames = [
+                { text: 'MATEO MCDERMOTT',      cls: 'intro-small',  dur: 950 },
+                { text: 'PRESENTS',             cls: 'intro-small',  dur: 900 },
+                { text: null,                                         dur: 350 },
+                { text: 'YOUR FAVORITE',        cls: 'intro-medium', dur: 750 },
+                { text: 'DRINKING GAME',        cls: 'intro-medium', dur: 750 },
+                { text: 'IS NOW MOBILE',        cls: 'intro-medium', dur: 950 },
+                { text: null,                                         dur: 450 },
+                { text: 'ROLL A 3...',          cls: 'intro-small',  dur: 650 },
+                { text: 'SOMEONE DRINKS',       cls: 'intro-medium', dur: 950 },
+                { text: null,                                         dur: 200 },
+                { text: 'DOUBLES?',             cls: 'intro-small',  dur: 650 },
+                { text: 'DISTRIBUTE THE PAIN',  cls: 'intro-medium', dur: 950 },
+                { text: null,                                         dur: 200 },
+                { text: 'ROLL A 7...',          cls: 'intro-small',  dur: 650 },
+                { text: 'RIGHT DRINKS',         cls: 'intro-medium', dur: 950 },
+                { text: null,                                         dur: 200 },
+                { text: 'ROLL AN 11...',        cls: 'intro-small',  dur: 650 },
+                { text: 'LEFT DRINKS',          cls: 'intro-medium', dur: 950 },
+                { text: null,                                         dur: 200 },
+                { text: 'ROLL A 9...',          cls: 'intro-small',  dur: 650 },
+                { text: 'EVERYONE DRINKS',      cls: 'intro-medium', dur: 950 },
+                { text: null,                                         dur: 450 },
+                { text: 'PLAY RESPONSIBLY',     cls: 'intro-small',  dur: 900 },
+                { text: 'HAVE FUN',             cls: 'intro-medium', dur: 950 },
+                { text: null,                                         dur: 550 },
+                { text: 'THREE MAN',            cls: 'intro-title',  dur: 1900 },
+            ];
+
+            let i = 0;
+
+            function nextFrame() {
+                if (done) return;
+                if (i >= frames.length) { finish(); return; }
+
+                const frame = frames[i++];
+
+                // Clear screen
+                textEl.className = '';
+                textEl.textContent = '';
+
+                if (!frame.text) {
+                    setTimeout(nextFrame, frame.dur);
+                    return;
+                }
+
+                // Brief black gap before each word pops in
+                setTimeout(() => {
+                    if (done) return;
+                    textEl.className = frame.cls;
+                    textEl.textContent = frame.text;
+                    void textEl.offsetWidth; // force reflow to restart animation
+                    textEl.classList.add('popping');
+                    setTimeout(nextFrame, frame.dur);
+                }, 55);
+            }
+
+            nextFrame();
+        })();
     </script>
 </body>
 
