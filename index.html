@@ -618,6 +618,80 @@
             line-height: 1.5;
         }
 
+        /* --- WHEEL SCREEN ANIMATIONS --- */
+
+        /* Glow pulse while spinning */
+        @keyframes wheelSpinGlow {
+            0%, 100% { box-shadow: 0 0 30px #FF0000; }
+            50%       { box-shadow: 0 0 80px #FF0000, 0 0 130px #FF000055; }
+        }
+        #spin-wheel.spinning { animation: wheelSpinGlow 0.5s ease-in-out infinite; }
+
+
+
+        /* Winner text slam */
+        @keyframes resultSlam {
+            0%   { transform: scale(1.7); opacity: 0; }
+            55%  { transform: scale(0.92); opacity: 1; }
+            78%  { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .wheel-result.slam { animation: resultSlam 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+        /* Screen flash on result */
+        #wheel-flash {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #FF0000;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 50;
+        }
+        @keyframes flashBurst {
+            0%   { opacity: 0.7; }
+            100% { opacity: 0; }
+        }
+        #wheel-flash.active { animation: flashBurst 0.35s ease-out forwards; }
+
+        /* Winner segment pulse */
+        @keyframes wheelWinPulse {
+            0%, 100% { box-shadow: 0 0 30px #FF0000; }
+            50%       { box-shadow: 0 0 70px #FFFFFF, 0 0 110px #FF0000; }
+        }
+        #spin-wheel.winner { animation: wheelWinPulse 0.65s ease-in-out 3; }
+
+        /* Spin button breathe before press */
+        @keyframes spinBtnPulse {
+            0%, 100% { box-shadow: none; }
+            50%       { box-shadow: 0 0 22px #FF0000, 0 0 44px #FF000044; }
+        }
+        .spin-btn.pulsing { animation: spinBtnPulse 1.2s ease-in-out infinite; }
+
+        /* Wheel screen title glitch */
+        #wheel-screen h2 { position: relative; }
+        #wheel-screen h2::before,
+        #wheel-screen h2::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 0 60px;
+            box-sizing: border-box;
+            opacity: 0;
+            pointer-events: none;
+            line-height: 1.4;
+        }
+        #wheel-screen h2.glitching::before {
+            color: #FF0000; text-shadow: none; opacity: 1;
+            animation: glitchRed 0.35s steps(2) both;
+        }
+        #wheel-screen h2.glitching::after {
+            color: #FFFFFF; text-shadow: none; opacity: 1;
+            animation: glitchWhite 0.35s steps(2) both;
+        }
+
         /* GEAR BUTTON — globally fixed, always top-right */
         .hamburger-btn {
             position: fixed;
@@ -643,6 +717,129 @@
             border-color: #FF0000;
             color: #FF0000;
         }
+
+        /* PAGE TRANSITION — FADE THROUGH BLACK */
+        #page-transition {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 800; background: #000; opacity: 0; pointer-events: none;
+            transition: opacity 280ms ease;
+        }
+        #page-transition.fade-in  { opacity: 1; pointer-events: all; }
+        #page-transition.fade-out { opacity: 0; pointer-events: none; }
+
+        /* THREE MAN DRINK ANIMATION OVERLAY */
+        #threeman-drink-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 600; display: none; justify-content: center; align-items: center;
+            cursor: pointer; overflow: hidden; font-family: 'Press Start 2P', monospace;
+        }
+        #threeman-drink-overlay.active { display: flex; }
+
+        /* WANTED POSTER */
+        #threeman-drink-overlay.anim-wanted { background: #1a0f00; }
+        .wanted-card {
+            border: 6px double #CC4400; background: #2d1a00;
+            padding: 24px 28px; text-align: center; max-width: 85vw;
+            animation: wantedSlam 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both;
+        }
+        @keyframes wantedSlam {
+            0%   { transform: scale(1.5) rotate(-3deg); opacity: 0; }
+            60%  { transform: scale(0.95) rotate(1deg); opacity: 1; }
+            80%  { transform: scale(1.02) rotate(-0.5deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        .wanted-title { color: #FF4400; font-size: clamp(1.5rem, 8vw, 2.5rem); margin-bottom: 12px; letter-spacing: 4px; }
+        .wanted-name  { color: #FFD700; font-size: clamp(1.4rem, 7vw, 2.2rem); margin: 16px 0; text-shadow: 2px 2px 0 #000; }
+        .wanted-sub   { color: #CC4400; font-size: clamp(0.5rem, 3vw, 0.75rem); margin-bottom: 16px; }
+        .wanted-drink { color: #FF0000; font-size: clamp(0.8rem, 4.5vw, 1.2rem); border: 2px solid #FF0000; padding: 8px 16px; display: inline-block; animation: wantedBlink 0.7s step-end infinite; }
+        @keyframes wantedBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* SPOTLIGHT */
+        #threeman-drink-overlay.anim-spotlight { background: #000; }
+        .spotlight-ring {
+            position: absolute; width: 60vmin; height: 60vmin; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,220,0.18) 0%, rgba(255,255,200,0.08) 40%, transparent 70%);
+            animation: spotlightGrow 0.6s ease-out both;
+        }
+        @keyframes spotlightGrow { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+        .spotlight-content { position: relative; text-align: center; z-index: 1; animation: spotFadeIn 0.5s 0.3s ease-out both; }
+        @keyframes spotFadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .spotlight-name { color: #FFFFFF; font-size: clamp(1.5rem, 8vw, 2.5rem); text-shadow: 0 0 30px #FFF, 0 0 60px #FFF8; margin-bottom: 16px; }
+        .spotlight-label { color: #FFD700; font-size: clamp(0.6rem, 3.5vw, 1rem); letter-spacing: 3px; animation: spotPulse 0.8s ease-in-out infinite; }
+        @keyframes spotPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        /* ARCADE GAME OVER */
+        #threeman-drink-overlay.anim-arcade { background: #000; animation: arcadeFlash 0.15s step-end 6; }
+        @keyframes arcadeFlash { 0%,100%{background:#000} 50%{background:#FF0000} }
+        .arcade-content { text-align: center; animation: arcadeSlam 0.35s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+        @keyframes arcadeSlam { 0%{transform:scaleY(0);opacity:0} 60%{transform:scaleY(1.1)} 100%{transform:scaleY(1);opacity:1} }
+        .arcade-gameover { color: #FF0000; font-size: clamp(2rem, 10vw, 3.5rem); text-shadow: 4px 4px 0 #FFFFFF; margin-bottom: 8px; }
+        .arcade-name { color: #FFFFFF; font-size: clamp(1.2rem, 6vw, 2rem); margin: 16px 0; }
+        .arcade-sip  { color: #FF0000; font-size: clamp(0.7rem, 4vw, 1.1rem); animation: arcadeBlink 0.5s step-end infinite; }
+        @keyframes arcadeBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* TARGET LOCK-ON */
+        #threeman-drink-overlay.anim-target { background: #000d00; }
+        .target-crosshair { position: absolute; width: 100%; height: 100%; pointer-events: none; display: flex; justify-content: center; align-items: center; }
+        .target-h { position: absolute; width: 100%; height: 1px; background: #00FF00; opacity: 0.4; animation: targetScanH 0.6s ease-out both; }
+        .target-v { position: absolute; height: 100%; width: 1px; background: #00FF00; opacity: 0.4; animation: targetScanV 0.6s ease-out both; }
+        @keyframes targetScanH { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+        @keyframes targetScanV { from{transform:scaleY(0)} to{transform:scaleY(1)} }
+        .target-circle { position: absolute; width: 50vmin; height: 50vmin; border-radius: 50%; border: 2px solid #00FF00; opacity: 0; animation: targetCircle 0.5s 0.4s ease-out forwards; }
+        @keyframes targetCircle { from{transform:scale(2);opacity:0} to{transform:scale(1);opacity:0.5} }
+        .target-content { position: relative; z-index: 1; text-align: center; animation: targetReveal 0.3s 0.5s ease-out both; }
+        @keyframes targetReveal { from{opacity:0;letter-spacing:10px} to{opacity:1;letter-spacing:normal} }
+        .target-name   { color: #00FF00; font-size: clamp(1.3rem, 7vw, 2.2rem); text-shadow: 0 0 20px #00FF00; margin-bottom: 12px; }
+        .target-locked { color: #00FF00; font-size: clamp(0.6rem, 3.5vw, 1rem); animation: targetBlink 0.4s step-end infinite; }
+        @keyframes targetBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* BOSS FIGHT INTRO */
+        #threeman-drink-overlay.anim-boss { background: #000; }
+        .boss-top    { position: absolute; top: 0; width: 100%; height: 50%; background: #111; animation: bossTop 0.5s cubic-bezier(0.36,0.07,0.19,0.97) forwards; }
+        .boss-bottom { position: absolute; bottom: 0; width: 100%; height: 50%; background: #111; animation: bossBottom 0.5s cubic-bezier(0.36,0.07,0.19,0.97) forwards; }
+        @keyframes bossTop    { from{transform:translateY(0)} to{transform:translateY(-100%)} }
+        @keyframes bossBottom { from{transform:translateY(0)} to{transform:translateY(100%)} }
+        .boss-content { position: relative; z-index: 1; text-align: center; animation: bossReveal 0.4s 0.35s ease-out both; }
+        @keyframes bossReveal { from{transform:scale(1.3);opacity:0} to{transform:scale(1);opacity:1} }
+        .boss-name   { color: #FF0000; font-size: clamp(1.5rem, 8vw, 2.5rem); text-shadow: 4px 4px 0 #FFFFFF; margin-bottom: 12px; }
+        .boss-vs     { color: #555; font-size: clamp(0.45rem, 2.5vw, 0.7rem); margin-bottom: 20px; letter-spacing: 2px; }
+        .boss-bar-bg   { width: 200px; max-width: 80vw; height: 14px; background: #333; border: 2px solid #555; margin: 0 auto; }
+        .boss-bar-fill { height: 100%; background: #FF0000; animation: bossDrain 1.5s 0.6s ease-out forwards; }
+        @keyframes bossDrain { from{width:100%} to{width:0%} }
+
+        /* BREAKING NEWS */
+        #threeman-drink-overlay.anim-news { background: #111; flex-direction: column; justify-content: center; align-items: stretch; }
+        .news-header { background: #FF0000; color: #FFF; text-align: center; padding: 10px; font-size: clamp(0.7rem, 4vw, 1rem); letter-spacing: 4px; animation: newsSlideDown 0.3s ease-out both; }
+        @keyframes newsSlideDown { from{transform:translateY(-100%)} to{transform:translateY(0)} }
+        .news-body    { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .news-sources { color: #888; font-size: clamp(0.45rem, 2.5vw, 0.65rem); margin-bottom: 16px; animation: newsFadeIn 0.4s 0.3s both; }
+        @keyframes newsFadeIn { from{opacity:0} to{opacity:1} }
+        .news-name    { color: #FFFFFF; font-size: clamp(1.3rem, 7vw, 2.2rem); margin-bottom: 8px; animation: newsPop 0.35s 0.5s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+        @keyframes newsPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+        .news-action  { color: #FF0000; font-size: clamp(0.6rem, 3.5vw, 0.9rem); animation: newsFadeIn 0.4s 0.8s both; }
+        .news-ticker  { background: #CC0000; color: #FFF; font-size: clamp(0.4rem, 2.5vw, 0.6rem); padding: 8px 0; overflow: hidden; white-space: nowrap; animation: newsSlideUp 0.3s 0.2s ease-out both; }
+        @keyframes newsSlideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        .ticker-inner { display: inline-block; animation: tickerScroll 8s linear infinite; }
+        @keyframes tickerScroll { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
+
+        /* ROYAL DECREE */
+        #threeman-drink-overlay.anim-royal { background: #1a0d2e; }
+        .royal-card   { border: 4px solid #C9A84C; background: #2a1a4e; padding: 28px 32px; text-align: center; max-width: 88vw; box-shadow: 0 0 40px #C9A84C44, inset 0 0 30px #00000088; animation: royalFadeIn 0.6s ease-out both; }
+        @keyframes royalFadeIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+        .royal-crown  { font-size: clamp(1.5rem, 8vw, 2.5rem); margin-bottom: 8px; animation: royalFloat 2s ease-in-out infinite; }
+        @keyframes royalFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        .royal-decree { color: #C9A84C; font-size: clamp(0.5rem, 3vw, 0.75rem); letter-spacing: 3px; margin-bottom: 16px; }
+        .royal-name   { color: #FFFFFF; font-size: clamp(1.3rem, 7vw, 2.2rem); margin: 12px 0; text-shadow: 0 0 20px #C9A84C88; }
+        .royal-action { color: #C9A84C; font-size: clamp(0.55rem, 3vw, 0.8rem); margin-top: 16px; }
+
+        /* SETTINGS — ANIMATION PICKER */
+        #anim-section { display: none; flex-direction: column; gap: 6px; padding: 6px 0; }
+        #anim-section.open { display: flex; }
+        .anim-option { padding: 12px 16px; background: #111; border: 2px solid #333; color: #888; font-family: 'Press Start 2P', monospace; font-size: 0.55rem; text-align: left; cursor: pointer; width: 100%; line-height: 1.6; }
+        .anim-option.selected { border-color: #FF0000; color: #FFFFFF; }
+        .anim-option-name { font-size: 0.6rem; color: inherit; }
+        .anim-option-desc { font-size: 0.45rem; color: #555; margin-top: 4px; }
+        .anim-option.selected .anim-option-desc { color: #888; }
 
         /* SETTINGS OVERLAY */
         #settings-overlay {
@@ -1056,17 +1253,16 @@
             100% { clip-path: inset(0 0 100% 0);  transform: translateX(0); opacity: 0; }
         }
 
-        /* Start button shake */
-        @keyframes btnShake {
-            0%, 100% { transform: translateX(0); }
-            15%      { transform: translateX(-7px); }
-            30%      { transform: translateX(7px); }
-            45%      { transform: translateX(-5px); }
-            60%      { transform: translateX(5px); }
-            75%      { transform: translateX(-3px); }
-            90%      { transform: translateX(3px); }
+        /* Start button slam */
+        @keyframes btnSlam {
+            0%   { transform: scale(1); }
+            20%  { transform: scaleX(1.07) scaleY(0.78); }
+            50%  { transform: scaleX(0.96) scaleY(1.1); }
+            70%  { transform: scaleX(1.02) scaleY(0.96); }
+            100% { transform: scale(1); }
         }
-        .start-btn.shaking { animation: btnShake 0.4s ease-in-out; }
+        .start-btn.slamming { animation: btnSlam 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+        .start-btn.pulsing  { animation: spinBtnPulse 1.2s ease-in-out infinite; }
 
     </style>
 
@@ -1134,7 +1330,8 @@
     </div>
 
     <div id="wheel-screen">
-        <h2>WHO IS THE THREE MAN?</h2>
+        <div id="wheel-flash"></div>
+        <h2 data-text="WHO IS THE THREE MAN?">WHO IS THE THREE MAN?</h2>
         <div class="current-three-man-display" id="current-three-man-display"></div>
         <div class="wheel-container">
             <div class="wheel-pointer-bottom"></div>
@@ -1170,6 +1367,9 @@
         </div>
 
     </div>
+
+    <div id="page-transition"></div>
+    <div id="threeman-drink-overlay"></div>
 
     <div id="drinking-timer">
         <div class="timer-content">
@@ -1321,6 +1521,40 @@
 
             </div>
 
+            <div class="settings-divider"></div>
+
+            <button class="settings-advanced-toggle" id="animToggle">&#9660; THREE MAN ANIMATION</button>
+            <div id="anim-section">
+                <button class="anim-option selected" data-anim="wanted">
+                    <div class="anim-option-name">WANTED POSTER</div>
+                    <div class="anim-option-desc">A punishment card slams onto screen. Drink up, outlaw.</div>
+                </button>
+                <button class="anim-option" data-anim="spotlight">
+                    <div class="anim-option-name">SPOTLIGHT</div>
+                    <div class="anim-option-desc">Darkness. Then a spotlight finds you. Nowhere to hide.</div>
+                </button>
+                <button class="anim-option" data-anim="arcade">
+                    <div class="anim-option-name">ARCADE GAME OVER</div>
+                    <div class="anim-option-desc">Classic red flash and GAME OVER energy. Retro punishment.</div>
+                </button>
+                <button class="anim-option" data-anim="target">
+                    <div class="anim-option-name">TARGET LOCK-ON</div>
+                    <div class="anim-option-desc">Crosshairs converge. You've been acquired. Drink.</div>
+                </button>
+                <button class="anim-option" data-anim="boss">
+                    <div class="anim-option-name">BOSS FIGHT INTRO</div>
+                    <div class="anim-option-desc">Street Fighter energy. You vs the bottle.</div>
+                </button>
+                <button class="anim-option" data-anim="news">
+                    <div class="anim-option-name">BREAKING NEWS</div>
+                    <div class="anim-option-desc">Sources confirm: you must drink. More at 11.</div>
+                </button>
+                <button class="anim-option" data-anim="royal">
+                    <div class="anim-option-name">ROYAL DECREE</div>
+                    <div class="anim-option-desc">By royal decree, thou shall drink. Pompous and final.</div>
+                </button>
+            </div>
+
             <button class="settings-close-btn" id="settingsCloseBtn">CLOSE</button>
         </div>
     </div>
@@ -1333,6 +1567,98 @@
         let players = [];
         let currentPlayerIndex = 0;
         let currentThreeMan = null;
+        let threeManAnimStyle = 'wanted';
+
+        function pageTransition(callback) {
+            const overlay = document.getElementById('page-transition');
+            const FADE = 280;
+
+            overlay.classList.add('fade-in');
+            setTimeout(() => {
+                callback();
+                overlay.classList.remove('fade-in');
+                overlay.classList.add('fade-out');
+                setTimeout(() => overlay.classList.remove('fade-out'), FADE);
+            }, FADE);
+        }
+
+        function showThreeManDrinkAnim(name, sips, customMsg) {
+            const overlay = document.getElementById('threeman-drink-overlay');
+            const sipText = customMsg || (sips > 1 ? `TAKE ${sips} SIPS!` : 'TAKE A SIP!');
+            let html = '';
+            switch (threeManAnimStyle) {
+                case 'wanted':
+                    html = `<div class="wanted-card">
+                        <div class="wanted-title">WANTED</div>
+                        <div class="wanted-name">${name}</div>
+                        <div class="wanted-sub">DEAD OR DRINKING</div>
+                        <div class="wanted-drink">${sipText}</div>
+                    </div>`;
+                    break;
+                case 'spotlight':
+                    html = `<div class="spotlight-ring"></div>
+                        <div class="spotlight-content">
+                            <div class="spotlight-name">${name}</div>
+                            <div class="spotlight-label">${sipText}</div>
+                        </div>`;
+                    break;
+                case 'arcade':
+                    html = `<div class="arcade-content">
+                        <div class="arcade-gameover">GAME OVER</div>
+                        <div class="arcade-name">${name}</div>
+                        <div class="arcade-sip">${sipText}</div>
+                    </div>`;
+                    break;
+                case 'target':
+                    html = `<div class="target-crosshair">
+                            <div class="target-h"></div>
+                            <div class="target-v"></div>
+                            <div class="target-circle"></div>
+                        </div>
+                        <div class="target-content">
+                            <div class="target-name">${name}</div>
+                            <div class="target-locked">&#9654; ${sipText}</div>
+                        </div>`;
+                    break;
+                case 'boss':
+                    html = `<div class="boss-top"></div>
+                        <div class="boss-bottom"></div>
+                        <div class="boss-content">
+                            <div class="boss-name">${name}</div>
+                            <div class="boss-vs">VS THE BOTTLE</div>
+                            <div class="boss-bar-bg"><div class="boss-bar-fill"></div></div>
+                        </div>`;
+                    break;
+                case 'news':
+                    html = `<div class="news-header">&#128250; BREAKING NEWS</div>
+                        <div class="news-body">
+                            <div class="news-sources">SOURCES CONFIRM:</div>
+                            <div class="news-name">${name}</div>
+                            <div class="news-action">${sipText}</div>
+                        </div>
+                        <div class="news-ticker"><span class="ticker-inner">&#9632; THREE MAN IDENTIFIED &#9632; ${name} MUST DRINK &#9632; DEVELOPING STORY &#9632; STAY TUNED &#9632;&nbsp;</span></div>`;
+                    break;
+                case 'royal':
+                    html = `<div class="royal-card">
+                        <div class="royal-crown">&#9819;</div>
+                        <div class="royal-decree">BY ROYAL DECREE</div>
+                        <div class="royal-name">${name}</div>
+                        <div class="royal-action">${sipText}</div>
+                    </div>`;
+                    break;
+            }
+            overlay.innerHTML = html;
+            overlay.className = `active anim-${threeManAnimStyle}`;
+            let dismissed = false;
+            function dismiss() {
+                if (dismissed) return;
+                dismissed = true;
+                overlay.className = '';
+                overlay.innerHTML = '';
+            }
+            overlay.addEventListener('click', dismiss, { once: true });
+            setTimeout(dismiss, 5000);
+        }
         let nextRollerIndex = 0;
 
         const nameInput = document.getElementById('playerName');
@@ -1411,18 +1737,16 @@
         document.getElementById('closeRulesBtn').addEventListener('click', () => {
             document.getElementById('rules-modal').classList.remove('active');
         });
-        document.getElementById('startGameBtn').addEventListener('click', () => {
-            if (players.length < 2) return showError("NEED AT LEAST 2 PLAYERS!");
+        // Pulse the start button on load
+        document.getElementById('startGameBtn').classList.add('pulsing');
 
-            // Shake the button then transition
-            const startBtn = document.getElementById('startGameBtn');
-            startBtn.classList.add('shaking');
-            startBtn.addEventListener('animationend', () => {
-                startBtn.classList.remove('shaking');
+        document.getElementById('startGameBtn').addEventListener('click', () => {
+            if (players.length < 3) return showError("NEED AT LEAST 3 PLAYERS!");
+            pageTransition(() => {
                 document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('wheel-screen').style.display = 'flex';
                 initWheelScreen();
-            }, { once: true });
+            });
         });
 
         function updateHUD() {
@@ -1527,62 +1851,103 @@
             });
             
             // Reset spin button
-            document.getElementById('spinWheelBtn').disabled = false;
-            document.getElementById('spinWheelBtn').textContent = 'SPIN THE WHEEL';
-            document.getElementById('wheel-result').textContent = '';
+            const spinBtn = document.getElementById('spinWheelBtn');
+            spinBtn.disabled = false;
+            spinBtn.textContent = 'SPIN THE WHEEL';
+            spinBtn.onclick = null;
+            spinBtn.classList.remove('pulsing');
+
+            const resultEl = document.getElementById('wheel-result');
+            resultEl.textContent = '';
+            resultEl.classList.remove('slam');
+
+            // Reset wheel and pointer classes
+            wheel.classList.remove('spinning', 'winner');
+            document.querySelector('.wheel-pointer-bottom').classList.remove();
+
             isSpinning = false;
-            
+
             // Set initial rotation
             const initialRotation = Math.random() * 360;
             wheel.style.transform = `rotate(${initialRotation}deg)`;
             wheel.style.transition = 'none';
+
+            // Title glitch on screen appear
+            const wheelH2 = document.querySelector('#wheel-screen h2');
+            setTimeout(() => {
+                wheelH2.classList.add('glitching');
+                setTimeout(() => wheelH2.classList.remove('glitching'), 400);
+            }, 150);
+
+            // Pulse the spin button to draw attention
+            setTimeout(() => spinBtn.classList.add('pulsing'), 300);
         }
 
         document.getElementById('spinWheelBtn').addEventListener('click', () => {
             if (isSpinning) return;
             isSpinning = true;
-            document.getElementById('spinWheelBtn').disabled = true;
+
+            const spinBtn = document.getElementById('spinWheelBtn');
+            spinBtn.disabled = true;
+            spinBtn.classList.remove('pulsing');
 
             const wheel = document.getElementById('spin-wheel');
+            const pointer = document.querySelector('.wheel-pointer-bottom');
             const numPlayers = players.length;
             const segmentAngle = 360 / numPlayers;
-            
+
+            // Start spinning animations
+            wheel.classList.add('spinning');
+
             // Select a random winning player
             const winningPlayerIndex = Math.floor(Math.random() * numPlayers);
             const winningPlayer = players[winningPlayerIndex];
 
             // Get current rotation
             const currentRotation = parseFloat(wheel.style.transform.replace('rotate(', '').replace('deg)', '')) || 0;
-            
-            // The right-side pointer is at 0° in SVG-Y convention (right = 0°).
-            // Segments are drawn with index 0 starting at -90° (top), going clockwise.
-            // After CSS rotate(R deg), a segment originally at angle θ appears at θ + R.
-            // We need: winningSegmentMidAngle + finalRotation ≡ 0 (mod 360)
-            // → finalRotation ≡ -winningSegmentMidAngle (mod 360)
-            const targetSegmentPosition = 0;
+
             const winningSegmentMidAngle = winningPlayerIndex * segmentAngle - 90 + (segmentAngle / 2);
             const targetRotation = ((-winningSegmentMidAngle) % 360 + 360) % 360;
-
-            // Spin forward at least 5 full rotations past the current position
             const fullSpinsNeeded = Math.ceil((currentRotation - targetRotation) / 360) + 5;
             const finalRotation = targetRotation + fullSpinsNeeded * 360;
 
             wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             wheel.style.transform = `rotate(${finalRotation}deg)`;
-            
+
             setTimeout(() => {
                 currentThreeMan = winningPlayer;
                 currentPlayerIndex = winningPlayerIndex;
                 isSpinning = false;
 
-                document.getElementById('wheel-result').textContent = `${winningPlayer} IS THE THREE MAN!`;
-                document.getElementById('spinWheelBtn').textContent = 'START GAME';
-                document.getElementById('spinWheelBtn').disabled = false;
-                document.getElementById('spinWheelBtn').onclick = () => {
-                    document.getElementById('wheel-screen').style.display = 'none';
-                    document.getElementById('game-screen').style.display = 'block';
-                    updateHUD();
-                    init3D();
+                // Stop spinning glow, start winner pulse
+                wheel.classList.remove('spinning');
+                wheel.classList.add('winner');
+                setTimeout(() => wheel.classList.remove('winner'), 2000);
+
+
+                // Screen flash
+                const flash = document.getElementById('wheel-flash');
+                flash.classList.remove('active');
+                void flash.offsetWidth;
+                flash.classList.add('active');
+
+                // Result text slam
+                const resultEl = document.getElementById('wheel-result');
+                resultEl.classList.remove('slam');
+                void resultEl.offsetWidth;
+                resultEl.textContent = `${winningPlayer} IS THE THREE MAN!`;
+                resultEl.classList.add('slam');
+
+                // Show start button
+                spinBtn.textContent = 'START GAME';
+                spinBtn.disabled = false;
+                spinBtn.onclick = () => {
+                    pageTransition(() => {
+                        document.getElementById('wheel-screen').style.display = 'none';
+                        document.getElementById('game-screen').style.display = 'block';
+                        updateHUD();
+                        init3D();
+                    });
                 };
             }, 4000);
         });
@@ -1787,6 +2152,7 @@
                             btn.textContent = `GIVE TO ${p}`;
                             btn.onclick = () => {
                                 currentThreeMan = p;
+                                showThreeManDrinkAnim(p, 0, 'YOU ARE THE THREE MAN!');
                                 updateHUD();
                                 selectList.style.display = 'none';
                                 // Now show doubles distribution
@@ -1800,6 +2166,7 @@
                 } else if (isThreeRolled && currentThreeMan) {
                     // Non-Three Man rolled 3+3 — Three Man drinks two sips
                     prompts.push(`${rollerName} ROLLED DOUBLES WITH A 3! ${currentThreeMan} (THREE MAN) TAKES TWO SIPS!`);
+                    showThreeManDrinkAnim(currentThreeMan, 2);
                     doublesRollData.pendingThreeManRoller = null;
                 } else {
                     doublesRollData.pendingThreeManRoller = null;
@@ -1820,6 +2187,7 @@
             else if (isThreeRolled && currentThreeMan) {
                 passTurn = false;
                 prompts.push(`${rollerName} ROLLED A 3! ${currentThreeMan} (THREE MAN) TAKES A SIP!`);
+                showThreeManDrinkAnim(currentThreeMan, 1);
             }
             // RULE 2b: If no Three Man yet and someone rolls a 3, nothing special
             else if (isThreeRolled) {
@@ -1882,6 +2250,13 @@
                 dismissBtn.style.display = 'none';
                 selectList.style.display = 'flex';
                 selectList.innerHTML = '';
+
+                // "Keep" option — stay as Three Man
+                const keepBtn = document.createElement('button');
+                keepBtn.className = 'select-btn';
+                keepBtn.textContent = `BRING IT ON! STAY AS THREE MAN`;
+                keepBtn.onclick = () => triggerThreeManTransfer(rollerName, nextRollerIndex);
+                selectList.appendChild(keepBtn);
 
                 players.forEach(p => {
                     if (p !== rollerName) {
@@ -2120,6 +2495,7 @@
                             timerEl.classList.remove('active');
                             timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
                             currentThreeMan = thief;
+                            showThreeManDrinkAnim(thief, 0, 'YOU ARE THE THREE MAN!');
                             updateHUD();
                             currentIndex++;
                             setTimeout(showNextTimer, 500);
@@ -2258,7 +2634,9 @@
 
         // Dedicated function to handle the manual transfer of the title
         function triggerThreeManTransfer(newPlayerName, nextRoller) {
+            const keeping = newPlayerName === currentThreeMan;
             currentThreeMan = newPlayerName;
+            showThreeManDrinkAnim(newPlayerName, 0, keeping ? 'STILL THE THREE MAN!' : 'YOU ARE THE THREE MAN!');
             document.getElementById('action-prompt').classList.remove('active');
 
             currentPlayerIndex = nextRoller;
@@ -2311,13 +2689,15 @@
             }
 
             // Return to landing page
-            document.getElementById('game-screen').style.display = 'none';
-            document.getElementById('wheel-screen').style.display = 'none';
-            document.getElementById('landing-page').style.display = 'flex';
+            pageTransition(() => {
+                document.getElementById('game-screen').style.display = 'none';
+                document.getElementById('wheel-screen').style.display = 'none';
+                document.getElementById('landing-page').style.display = 'flex';
 
-            // Clear player list UI
-            document.getElementById('playerList').innerHTML = '';
-            document.getElementById('playerName').value = '';
+                // Clear player list UI
+                document.getElementById('playerList').innerHTML = '';
+                document.getElementById('playerName').value = '';
+            });
         });
 
         // ==========================================
@@ -2491,6 +2871,23 @@
             const btn = e.target.closest('.toggle-opt');
             if (!btn) return;
             document.querySelectorAll('#soundGroup .toggle-opt').forEach(b => b.classList.toggle('active', b === btn));
+        });
+
+        // Animation section toggle
+        document.getElementById('animToggle').addEventListener('click', () => {
+            const section = document.getElementById('anim-section');
+            const btn = document.getElementById('animToggle');
+            const open = section.classList.toggle('open');
+            btn.textContent = (open ? '▲' : '▼') + ' THREE MAN ANIMATION';
+        });
+
+        // Animation style selection
+        document.getElementById('anim-section').addEventListener('click', (e) => {
+            const opt = e.target.closest('.anim-option');
+            if (!opt) return;
+            document.querySelectorAll('.anim-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            threeManAnimStyle = opt.dataset.anim;
         });
 
         // Gameplay section toggle
