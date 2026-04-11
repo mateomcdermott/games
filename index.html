@@ -2702,12 +2702,12 @@
 
             // Build combined pop-up
             const rowsHtml = processed.map(({ player, seconds, immune }) => `
-                <div style="text-align: center; padding: 10px 20px; border-bottom: 1px solid #1a1a1a;">
-                    <div style="font-size: clamp(0.75rem, 3.5vw, 1rem); color: #FF0000; margin-bottom: 6px;">${player}</div>
+                <div style="text-align: center; padding: 14px 24px; border-bottom: 1px solid #1a1a1a;">
+                    <div style="font-size: clamp(1rem, 5vw, 1.4rem); color: #FF0000; margin-bottom: 8px;">${player}</div>
                     ${immune
-                        ? `<div style="font-size: clamp(0.65rem, 3vw, 0.9rem); color: #FFFFFF;">IMMUNITY — NO DRINK</div>`
-                        : `<div style="font-size: clamp(1.8rem, 9vw, 3rem); color: #FFFFFF; line-height: 1;">${seconds}</div>
-                           <div style="font-size: clamp(0.4rem, 1.8vw, 0.55rem); color: #666; margin-top: 2px;">SECONDS TO DRINK</div>`
+                        ? `<div style="font-size: clamp(0.8rem, 4vw, 1.1rem); color: #FFFFFF;">IMMUNITY — NO DRINK</div>`
+                        : `<div style="font-size: clamp(2.5rem, 13vw, 4.5rem); color: #FFFFFF; line-height: 1;">${seconds}</div>
+                           <div style="font-size: clamp(0.5rem, 2.5vw, 0.75rem); color: #666; margin-top: 4px;">SECONDS TO DRINK</div>`
                     }
                 </div>
             `).join('');
@@ -2720,7 +2720,7 @@
             timerEl.querySelector('.timer-content').innerHTML = `
                 ${rowsHtml}
                 ${countdownHtml}
-                <div style="font-size: clamp(0.35rem, 1.6vw, 0.5rem); color: #333; text-align: center; padding: 14px 16px 4px; letter-spacing: 0.06em;">
+                <div style="font-size: clamp(0.5rem, 2.2vw, 0.7rem); color: #444; text-align: center; padding: 16px 16px 6px; letter-spacing: 0.06em;">
                     TAP ANYWHERE WHEN SIPS ARE DONE
                 </div>
             `;
@@ -2728,34 +2728,25 @@
             timerEl.classList.add('active');
 
             let dismissed = false;
-            let autoTimer = null;
             let countdownInterval = null;
 
             function dismiss() {
                 if (dismissed) return;
                 dismissed = true;
-                if (autoTimer) clearTimeout(autoTimer);
                 if (countdownInterval) clearInterval(countdownInterval);
                 endAllDrinks(bountyThief);
             }
 
             timerEl.addEventListener('click', dismiss, { once: true });
 
-            if (maxSeconds > 0) {
-                autoTimer = setTimeout(dismiss, maxSeconds * 1000);
-
-                if (gameplay.drinkTimer) {
-                    let remaining = maxSeconds;
-                    countdownInterval = setInterval(() => {
-                        remaining--;
-                        const el = document.getElementById('combined-countdown');
-                        if (el) el.textContent = `TIME LEFT: ${remaining}s`;
-                        if (remaining <= 0) clearInterval(countdownInterval);
-                    }, 1000);
-                }
-            } else {
-                // All immune — dismiss quickly
-                autoTimer = setTimeout(dismiss, 1500);
+            if (gameplay.drinkTimer && maxSeconds > 0) {
+                let remaining = maxSeconds;
+                countdownInterval = setInterval(() => {
+                    remaining--;
+                    const el = document.getElementById('combined-countdown');
+                    if (el) el.textContent = `TIME LEFT: ${remaining}s`;
+                    if (remaining <= 0) clearInterval(countdownInterval);
+                }, 1000);
             }
         }
 
@@ -2845,12 +2836,12 @@
 
             timerEl.querySelector('.timer-content').innerHTML = `
                 <div style="text-align: center; padding: 10px 20px; border-bottom: 1px solid #1a1a1a;">
-                    <div style="font-size: clamp(0.75rem, 3.5vw, 1rem); color: #FF0000; margin-bottom: 6px;">${rollerName}</div>
-                    <div style="font-size: clamp(1.8rem, 9vw, 3rem); color: #FFFFFF; line-height: 1;">${penaltySum}</div>
-                    <div style="font-size: clamp(0.4rem, 1.8vw, 0.55rem); color: #666; margin-top: 2px;">SECONDS TO DRINK — ${sum} × ${multiplier} PENALTY</div>
+                    <div style="font-size: clamp(1rem, 5vw, 1.4rem); color: #FF0000; margin-bottom: 8px;">${rollerName}</div>
+                    <div style="font-size: clamp(2.5rem, 13vw, 4.5rem); color: #FFFFFF; line-height: 1;">${penaltySum}</div>
+                    <div style="font-size: clamp(0.5rem, 2.5vw, 0.75rem); color: #666; margin-top: 4px;">SECONDS TO DRINK — ${sum} × ${multiplier} PENALTY</div>
                 </div>
                 ${countdownHtml}
-                <div style="font-size: clamp(0.35rem, 1.6vw, 0.5rem); color: #333; text-align: center; padding: 14px 16px 4px; letter-spacing: 0.06em;">
+                <div style="font-size: clamp(0.5rem, 2.2vw, 0.7rem); color: #444; text-align: center; padding: 16px 16px 6px; letter-spacing: 0.06em;">
                     TAP ANYWHERE WHEN SIPS ARE DONE
                 </div>
             `;
@@ -2858,19 +2849,16 @@
             timerEl.classList.add('active');
 
             let dismissed = false;
-            let autoTimer = null;
             let countdownInterval = null;
 
             function dismissPenalty() {
                 if (dismissed) return;
                 dismissed = true;
-                if (autoTimer) clearTimeout(autoTimer);
                 if (countdownInterval) clearInterval(countdownInterval);
                 endPenaltyTurn();
             }
 
             timerEl.addEventListener('click', dismissPenalty, { once: true });
-            autoTimer = setTimeout(dismissPenalty, penaltySum * 1000);
 
             if (gameplay.drinkTimer) {
                 let remaining = penaltySum;
