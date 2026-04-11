@@ -190,7 +190,7 @@
         .hud-top {
             background-color: #000000;
             border-bottom: 4px solid #FF0000;
-            padding: 15px 60px 15px 15px;
+            padding: 12px 60px 0 15px;
             text-align: center;
             pointer-events: auto;
         }
@@ -204,10 +204,73 @@
             letter-spacing: 0.05em;
         }
 
-        .turn-indicator {
-            font-size: clamp(1.1rem, 4vw, 1.8rem);
+        .player-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            padding: 4px 8px 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            flex-wrap: nowrap;
+        }
+
+        .player-strip::-webkit-scrollbar { display: none; }
+
+        .player-pill {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 2px solid #222;
+            color: #444;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(0.45rem, 2vw, 0.65rem);
+            white-space: nowrap;
+            transition: background 250ms ease, border-color 250ms ease, color 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+            flex-shrink: 0;
+            line-height: 1.4;
+            cursor: default;
+        }
+
+        .player-pill.is-rolling {
+            background: #FF0000;
+            border-color: #FF0000;
             color: #FFFFFF;
-            letter-spacing: 0.05em;
+            transform: scale(1.12);
+            box-shadow: 0 0 16px rgba(255, 0, 0, 0.55);
+        }
+
+        .player-pill.is-three-man:not(.is-rolling) {
+            border-color: #FF0000;
+            color: #FF0000;
+        }
+
+        .player-pill.is-next {
+            border-color: #3a3a3a;
+            color: #666;
+        }
+
+        .strip-arrow {
+            color: #252525;
+            font-size: 0.45rem;
+            padding: 0 5px;
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .pill-name {
+            display: block;
+        }
+
+        .pill-role {
+            display: block;
+            font-size: 0.38rem;
+            opacity: 0.85;
+            margin-top: 2px;
+            letter-spacing: 0.04em;
         }
 
         .hud-bottom {
@@ -1375,7 +1438,7 @@
         <div id="ui-layer">
             <div class="hud-top">
                 <div class="three-man-banner" id="hud-threeman">THREE MAN: NONE</div>
-                <div class="turn-indicator" id="hud-turn">ROLLER: ---</div>
+                <div class="player-strip" id="player-strip"></div>
             </div>
             <div class="hud-bottom">
                 <button class="roll-btn" id="rollBtn">ROLL DICE</button>
@@ -1457,11 +1520,11 @@
                         <button class="info-btn" data-key="drinkTimer">&#8505;</button>
                     </div>
                     <div class="advanced-toggle-group" id="drinkTimerGroup">
-                        <button class="toggle-opt" data-val="off">OFF</button>
-                        <button class="toggle-opt active" data-val="on">ON</button>
+                        <button class="toggle-opt active" data-val="off">OFF</button>
+                        <button class="toggle-opt" data-val="on">ON</button>
                     </div>
                 </div>
-                <div class="info-desc" id="info-drinkTimer">Skip the countdown. Players just drink at their own pace!</div>
+                <div class="info-desc" id="info-drinkTimer">Shows how many seconds to drink. Toggle ON for a live countdown.</div>
 
                 <div class="gameplay-row">
                     <div class="gameplay-left">
@@ -1790,8 +1853,54 @@
         });
 
         function updateHUD() {
-            document.getElementById('hud-turn').textContent = `ROLLER: ${players[currentPlayerIndex]}`;
             document.getElementById('hud-threeman').textContent = currentThreeMan ? `THREE MAN: ${currentThreeMan}` : `THREE MAN: NONE`;
+
+            const strip = document.getElementById('player-strip');
+            strip.innerHTML = '';
+
+            const nextIdx = (currentPlayerIndex + 1) % players.length;
+
+            players.forEach((p, i) => {
+                if (i > 0) {
+                    const arrow = document.createElement('span');
+                    arrow.className = 'strip-arrow';
+                    arrow.textContent = '▶';
+                    strip.appendChild(arrow);
+                }
+
+                const isRolling = i === currentPlayerIndex;
+                const isThreeMan = p === currentThreeMan;
+                const isNext = i === nextIdx && players.length > 1;
+
+                const pill = document.createElement('div');
+                pill.className = 'player-pill' +
+                    (isRolling ? ' is-rolling' : '') +
+                    (isThreeMan ? ' is-three-man' : '') +
+                    (isNext && !isRolling ? ' is-next' : '');
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'pill-name';
+                nameSpan.textContent = p;
+                pill.appendChild(nameSpan);
+
+                if (isRolling || isThreeMan || isNext) {
+                    const roleSpan = document.createElement('span');
+                    roleSpan.className = 'pill-role';
+                    if (isRolling && isThreeMan) roleSpan.textContent = '★ ROLLING';
+                    else if (isRolling)          roleSpan.textContent = 'ROLLING';
+                    else if (isThreeMan)         roleSpan.textContent = '3-MAN';
+                    else if (isNext)             roleSpan.textContent = 'NEXT';
+                    pill.appendChild(roleSpan);
+                }
+
+                strip.appendChild(pill);
+            });
+
+            // Scroll roller pill into center view
+            setTimeout(() => {
+                const active = strip.querySelector('.is-rolling');
+                if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }, 60);
         }
 
         // ==========================================
@@ -2158,7 +2267,8 @@
             const die1 = getDieResult(diceArray[0].mesh);
             const die2 = getDieResult(diceArray[1].mesh);
             const sum = die1 + die2;
-            const rollerName = players[currentPlayerIndex];
+            const rollerIdx = currentPlayerIndex;
+            const rollerName = players[rollerIdx];
 
             let prompts = [];
             let passTurn = true;
@@ -2171,7 +2281,7 @@
             // RULE 4: Action Rolls — handle doubles first
             if (isDoubles) {
                 passTurn = false;
-                const doublesNextRoller = (currentPlayerIndex + 1) % players.length;
+                const doublesNextRoller = (rollerIdx + 1) % players.length;
 
                 if (isThreeRolled && currentThreeMan === rollerName) {
                     // Three Man rolled 3+3 — title-pass happens FIRST, then doubles distribution
@@ -2184,8 +2294,9 @@
                     const selectList = document.getElementById('player-select-list');
                     selectList.style.display = 'flex';
                     selectList.innerHTML = '';
-                    players.forEach(p => {
-                        if (p !== rollerName) {
+                    const currentTM = currentThreeMan;
+                    players.forEach((p) => {
+                        if (p !== currentTM) {
                             const btn = document.createElement('button');
                             btn.className = 'select-btn';
                             btn.textContent = `GIVE TO ${p}`;
@@ -2242,9 +2353,10 @@
             lastRoller = rollerName;
 
             // 7 / 11 (with Reverse Round support)
-            const rightIdx = (currentPlayerIndex + 1) % players.length;
-            const leftIdx = (currentPlayerIndex - 1 + players.length) % players.length;
+            const rightIdx = (rollerIdx + 1) % players.length;
+            const leftIdx = (rollerIdx - 1 + players.length) % players.length;
             if (sum === 7) {
+                passTurn = false;
                 if (gameplay.chainReaction) {
                     prompts.push(`7! CHAIN REACTION! ${players[rightIdx]} (Right) AND ${players[leftIdx]} (Left) drink!`);
                 } else if (gameplay.reverseRound) {
@@ -2253,6 +2365,7 @@
                     prompts.push(`7! ${players[rightIdx]} (Right) drinks!`);
                 }
             } else if (sum === 11) {
+                passTurn = false;
                 if (gameplay.chainReaction) {
                     prompts.push(`11! CHAIN REACTION! ${players[leftIdx]} (Left) AND ${players[rightIdx]} (Right) drink!`);
                 } else if (gameplay.reverseRound) {
@@ -2272,10 +2385,10 @@
             if (prompts.length === 0) prompts.push("Nothing happens.");
 
             if (passTurn) {
-                nextRollerIndex = (currentPlayerIndex + 1) % players.length;
+                nextRollerIndex = (rollerIdx + 1) % players.length;
                 document.getElementById('dismissBtn').textContent = `PASS TO ${players[nextRollerIndex]}`;
             } else {
-                nextRollerIndex = currentPlayerIndex;
+                nextRollerIndex = rollerIdx;
                 document.getElementById('dismissBtn').textContent = `ROLL AGAIN`;
             }
 
@@ -2291,19 +2404,24 @@
                 selectList.style.display = 'flex';
                 selectList.innerHTML = '';
 
+                // The Three Man is the roller — use currentThreeMan as the authoritative identity
+                const threeManName = currentThreeMan;
+                const threeManActualIdx = players.indexOf(threeManName);
+                const threeManNextRoller = (threeManActualIdx + 1) % players.length;
+
                 // "Keep" option — stay as Three Man
                 const keepBtn = document.createElement('button');
                 keepBtn.className = 'select-btn';
                 keepBtn.textContent = `BRING IT ON! STAY AS THREE MAN`;
-                keepBtn.onclick = () => triggerThreeManTransfer(rollerName, nextRollerIndex);
+                keepBtn.onclick = () => triggerThreeManTransfer(threeManName, threeManNextRoller);
                 selectList.appendChild(keepBtn);
 
-                players.forEach(p => {
-                    if (p !== rollerName) {
+                players.forEach((p) => {
+                    if (p !== threeManName) {
                         const btn = document.createElement('button');
                         btn.className = 'select-btn';
                         btn.textContent = `GIVE TO ${p}`;
-                        btn.onclick = () => triggerThreeManTransfer(p, nextRollerIndex);
+                        btn.onclick = () => triggerThreeManTransfer(p, threeManNextRoller);
                         selectList.appendChild(btn);
                     }
                 });
@@ -2350,7 +2468,7 @@
                     document.getElementById('action-prompt').classList.add('active');
                     setTimeout(() => {
                         document.getElementById('action-prompt').classList.remove('active');
-                        showDrinkingTimers(results, nextRoller, 'double-trouble');
+                        showDrinkingTimers(results, nextRoller);
                     }, 1500);
                 }, 300);
                 return;
@@ -2363,13 +2481,13 @@
             const option1 = document.createElement('button');
             option1.className = 'distribution-option';
             option1.textContent = 'PASS 1 DIE TO 2 PEOPLE';
-            option1.onclick = () => selectPlayersForDistribution('one-die-two-people', diceValue);
+            option1.onclick = () => selectPlayersForDistribution('one-die-two-people');
             distDiv.appendChild(option1);
 
             const option2 = document.createElement('button');
             option2.className = 'distribution-option';
             option2.textContent = 'PASS BOTH DICE TO 1 PERSON';
-            option2.onclick = () => selectPlayersForDistribution('both-dice-one-person', diceValue);
+            option2.onclick = () => selectPlayersForDistribution('both-dice-one-person');
             distDiv.appendChild(option2);
 
             document.getElementById('player-select-list').style.display = 'none';
@@ -2378,7 +2496,7 @@
             setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
         }
 
-        function selectPlayersForDistribution(distributionType, diceValue) {
+        function selectPlayersForDistribution(distributionType) {
             const selectList = document.getElementById('player-select-list');
             selectList.style.display = 'flex';
             selectList.innerHTML = '';
@@ -2422,195 +2540,49 @@
             confirmBtn.style.color = '#000000';
             confirmBtn.onclick = () => {
                 if (selectedPlayers.length === maxSelections) {
-                    executeDoublesRoll(distributionType, selectedPlayers, diceValue);
+                    executeDoublesRoll(distributionType, selectedPlayers);
                 }
             };
             selectList.appendChild(confirmBtn);
         }
 
-        function executeDoublesRoll(distributionType, selectedPlayers, diceValue) {
+        function executeDoublesRoll(distributionType, selectedPlayers) {
+            doublesRollData.distributionType = distributionType;
+            doublesRollData.selectedPlayers = selectedPlayers;
             document.getElementById('action-prompt').classList.remove('active');
-            
-            // Roll for each selected player
-            const results = [];
-            selectedPlayers.forEach(playerName => {
-                // Simulate die roll (1-6)
-                const rollResult = Math.floor(Math.random() * 6) + 1;
-                results.push({ player: playerName, seconds: rollResult });
-            });
-
-            // Show each player's timer
-            showDrinkingTimers(results, doublesRollData.nextRoller, distributionType);
+            showRecipientRollPrompt();
         }
 
-        function showDrinkingTimers(results, nextRoller, distributionType) {
-            // Check if one-die-two-people and both rolled the same
-            if (distributionType === 'one-die-two-people' && results.length === 2 && results[0].seconds === results[1].seconds) {
-                // Both rolled the same! No drinks for them, re-roll for the original roller with DOUBLED penalty
-                doublesMatchCycle++; // Increment cycle counter
-                handleMatchingRoll(nextRoller);
-                return;
-            }
+        function showRecipientRollPrompt() {
+            const { selectedPlayers, distributionType } = doublesRollData;
+            const names = selectedPlayers.join(' & ');
+            const diceDesc = distributionType === 'both-dice-one-person' ? 'BOTH DICE' : '1 DIE EACH';
+            const multiplier = doublesMatchCycle > 0 ? ` (${doublesMatchCycle + 1}× MULTIPLIER ON THE LINE!)` : '';
 
-            // Calculate multiplier based on cycle count
-            let multiplier = (doublesMatchCycle === 0) ? 1 : (doublesMatchCycle + 2);
-            
-            // Apply multiplier to results
-            const multipliedResults = results.map(r => ({ 
-                player: r.player, 
-                seconds: r.seconds * multiplier 
-            }));
+            document.getElementById('prompt-title').textContent = 'RECIPIENTS ROLL!';
+            document.getElementById('prompt-desc').innerHTML = `${names}<br><br>ROLL ${diceDesc}!${multiplier}`;
+            document.getElementById('dismissBtn').style.display = 'none';
+            document.getElementById('player-select-list').style.display = 'none';
+            document.getElementById('dice-distribution').style.display = 'none';
 
-            let currentIndex = 0;
+            const existing = document.getElementById('recipient-roll-btn');
+            if (existing) existing.remove();
 
-            function showNextTimer() {
-                if (currentIndex >= multipliedResults.length) {
-                    // All timers done, end turn
-                    // Apply any pending Three Man effect from rolling 3+3
-                    if (doublesRollData.pendingThreeManRoller) {
-                        const roller = doublesRollData.pendingThreeManRoller;
-                        if (doublesRollData.pendingThreeManIsCurrentThreeMan) {
-                            // They were already Three Man — show selection UI
-                            document.getElementById('prompt-title').textContent = 'ROLLED A 3!';
-                            document.getElementById('prompt-desc').innerHTML = 'PASS THE TITLE!';
-                            const selectList = document.getElementById('player-select-list');
-                            const dismissBtn = document.getElementById('dismissBtn');
-                            dismissBtn.style.display = 'none';
-                            selectList.style.display = 'flex';
-                            selectList.innerHTML = '';
-                            const threeNextRoller = nextRoller;
-                            players.forEach(p => {
-                                if (p !== roller) {
-                                    const btn = document.createElement('button');
-                                    btn.className = 'select-btn';
-                                    btn.textContent = `GIVE TO ${p}`;
-                                    btn.onclick = () => triggerThreeManTransfer(p, threeNextRoller);
-                                    selectList.appendChild(btn);
-                                }
-                            });
-                            setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
-                        } else {
-                            currentThreeMan = roller;
-                            currentPlayerIndex = nextRoller;
-                            updateHUD();
-                        }
-                        doublesRollData.pendingThreeManRoller = null;
-                        isRolling = false;
-                        document.getElementById('rollBtn').disabled = false;
-                        document.getElementById('rollBtn').textContent = "ROLL DICE";
-                        document.getElementById('dice-distribution').style.display = 'none';
-                        doublesMatchCycle = 0;
-                        return;
-                    }
-                    currentPlayerIndex = nextRoller;
-                    updateHUD();
-                    isRolling = false;
-                    document.getElementById('rollBtn').disabled = false;
-                    document.getElementById('rollBtn').textContent = "ROLL DICE";
-                    document.getElementById('dice-distribution').style.display = 'none';
-                    doublesMatchCycle = 0; // Reset cycle for next turn
-                    return;
-                }
-
-                let { player, seconds } = multipliedResults[currentIndex];
-                const timerEl = document.getElementById('drinking-timer');
-
-                // IMMUNITY ROUND — Three Man can block one drink
-                if (gameplay.immunityRound && !immunityUsed && player === currentThreeMan) {
-                    immunityUsed = true;
-                    document.getElementById('timer-player-name').textContent = `${player} (THREE MAN)`;
-                    document.getElementById('timer-seconds').textContent = '🛡';
-                    timerEl.querySelector('.timer-instruction').textContent = 'IMMUNITY USED! NO DRINK THIS TIME.';
-                    timerEl.classList.add('active');
-                    setTimeout(() => {
-                        timerEl.classList.remove('active');
-                        timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
-                        currentIndex++;
-                        setTimeout(showNextTimer, 500);
-                    }, 2500);
-                    return;
-                }
-
-                // BOUNTY — track drinks forced on Three Man
-                if (gameplay.bounty && player === currentThreeMan) {
-                    threeManDrinkCount++;
-                    if (threeManDrinkCount >= 5) {
-                        // Find who last triggered this drink (the current roller)
-                        const thief = players[currentPlayerIndex];
-                        threeManDrinkCount = 0;
-                        // Show bounty message then steal title
-                        document.getElementById('timer-player-name').textContent = `BOUNTY CLAIMED!`;
-                        document.getElementById('timer-seconds').textContent = '👑';
-                        timerEl.querySelector('.timer-instruction').textContent = `${thief} STEALS THE THREE MAN TITLE!`;
-                        timerEl.classList.add('active');
-                        setTimeout(() => {
-                            timerEl.classList.remove('active');
-                            timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
-                            currentThreeMan = thief;
-                            showThreeManDrinkAnim(thief, 0, 'YOU ARE THE THREE MAN!');
-                            updateHUD();
-                            currentIndex++;
-                            setTimeout(showNextTimer, 500);
-                        }, 3000);
-                        return;
-                    }
-                }
-
-                document.getElementById('timer-player-name').textContent = player;
-                document.getElementById('timer-seconds').textContent = seconds;
-                timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
-
-                // DRINK TIMER OFF — skip countdown, just flash briefly
-                if (!gameplay.drinkTimer) {
-                    timerEl.querySelector('.timer-seconds') && (document.getElementById('timer-seconds').textContent = 'DRINK!');
-                    timerEl.classList.add('active');
-                    setTimeout(() => {
-                        timerEl.classList.remove('active');
-                        currentIndex++;
-                        setTimeout(showNextTimer, 300);
-                    }, 1500);
-                    return;
-                }
-
-                timerEl.classList.add('active');
-                let countdown = seconds;
-                const interval = setInterval(() => {
-                    countdown--;
-                    document.getElementById('timer-seconds').textContent = countdown;
-                    if (countdown < 0) {
-                        clearInterval(interval);
-                        currentIndex++;
-                        timerEl.classList.remove('active');
-                        setTimeout(showNextTimer, 500);
-                    }
-                }, 1000);
-            }
-
-            showNextTimer();
+            const rollBtn = document.createElement('button');
+            rollBtn.id = 'recipient-roll-btn';
+            rollBtn.className = 'dismiss-btn';
+            rollBtn.textContent = 'ROLL!';
+            rollBtn.style.marginTop = '20px';
+            rollBtn.onclick = () => {
+                rollBtn.remove();
+                document.getElementById('action-prompt').classList.remove('active');
+                triggerRecipientRoll();
+            };
+            document.getElementById('action-prompt').appendChild(rollBtn);
+            setTimeout(() => document.getElementById('action-prompt').classList.add('active'), 300);
         }
 
-        function handleMatchingRoll(nextRoller) {
-            // Show a message that both players rolled the same
-            const timerEl = document.getElementById('drinking-timer');
-            const contentEl = timerEl.querySelector('.timer-content');
-            const nextMultiplier = doublesMatchCycle + 2; // Show what next multiplier will be
-            contentEl.innerHTML = `
-                <div style="font-size: 1.5rem; color: #FFFFFF; margin-bottom: 20px;">BOTH ROLLED THE SAME!</div>
-                <div style="font-size: 1.2rem; color: #FF0000; margin-bottom: 40px;">NO DRINKS FOR THEM!</div>
-                <div style="font-size: 1rem; color: #FFFFFF;">Rolling again for ${doublesRollData.rollerName}...</div>
-                <div style="font-size: 0.9rem; color: #FF0000; margin-top: 20px;">NEXT PENALTY: ${nextMultiplier}x MULTIPLIER!</div>
-            `;
-            timerEl.classList.add('active');
-
-            setTimeout(() => {
-                timerEl.classList.remove('active');
-                // Now roll again for the original roller
-                rerrollDoublesWithPenalty(nextRoller);
-            }, 3000);
-        }
-
-        function rerrollDoublesWithPenalty(nextRoller) {
-            // Manually trigger a re-roll for the original roller
+        function triggerRecipientRoll() {
             const speedMult = diceSpeed === 'slow' ? 0.5 : diceSpeed === 'fast' ? 1.7 : 1.0;
             diceArray.forEach((die, index) => {
                 const modifier = index === 0 ? -1 : 1;
@@ -2618,12 +2590,186 @@
                 die.body.velocity.set(modifier * (Math.random() * 5) * speedMult, -10 * speedMult, Math.random() * 10 * speedMult);
                 die.body.angularVelocity.set(Math.random() * 20 * speedMult, Math.random() * 20 * speedMult, Math.random() * 20 * speedMult);
             });
-
-            setTimeout(() => { 
-                rollCheckInterval = setInterval(checkIfAsleepForPenaltyRoll, 100); 
+            setTimeout(() => {
+                rollCheckInterval = setInterval(checkIfAsleepForRecipientRoll, 100);
             }, 500);
+        }
 
-            // Store the fact that the next roll should be doubled
+        function checkIfAsleepForRecipientRoll() {
+            let stopped = true;
+            diceArray.forEach(die => {
+                if (die.body.velocity.lengthSquared() > 0.05 || die.body.angularVelocity.lengthSquared() > 0.05) { stopped = false; }
+            });
+            if (stopped) {
+                clearInterval(rollCheckInterval);
+                processRecipientRollResults();
+            }
+        }
+
+        function processRecipientRollResults() {
+            const die1 = getDieResult(diceArray[0].mesh);
+            const die2 = getDieResult(diceArray[1].mesh);
+            const { distributionType, selectedPlayers, nextRoller } = doublesRollData;
+
+            let cycleTriggered = false;
+            let results = [];
+
+            if (distributionType === 'one-die-two-people') {
+                // die1 → recipient 0, die2 → recipient 1; cycle if equal
+                if (die1 === die2) {
+                    cycleTriggered = true;
+                } else {
+                    results = [
+                        { player: selectedPlayers[0], seconds: die1 },
+                        { player: selectedPlayers[1], seconds: die2 }
+                    ];
+                }
+            } else {
+                // both-dice-one-person: recipient drinks sum; cycle if doubles
+                if (die1 === die2) {
+                    cycleTriggered = true;
+                } else {
+                    results = [{ player: selectedPlayers[0], seconds: die1 + die2 }];
+                }
+            }
+
+            if (cycleTriggered) {
+                doublesMatchCycle++;
+                const multiplier = doublesMatchCycle + 1; // 1st match=2×, 2nd=3×, ...
+                const matchMsg = distributionType === 'one-die-two-people' ? 'BOTH ROLLED THE SAME!' : 'ROLLED DOUBLES!';
+                const timerEl = document.getElementById('drinking-timer');
+                timerEl.querySelector('.timer-content').innerHTML = `
+                    <div style="font-size: 1.5rem; color: #FFFFFF; margin-bottom: 20px;">${matchMsg}</div>
+                    <div style="font-size: 1.2rem; color: #FF0000; margin-bottom: 30px;">NO DRINKS! DICE RETURN TO ${doublesRollData.rollerName.toUpperCase()}!</div>
+                    <div style="font-size: 0.9rem; color: #FF0000;">PENALTY MULTIPLIER: ${multiplier}×</div>
+                `;
+                timerEl.classList.add('active');
+                setTimeout(() => {
+                    timerEl.classList.remove('active');
+                    timerEl.querySelector('.timer-content').innerHTML = `
+                        <div class="timer-player-name" id="timer-player-name">---</div>
+                        <div class="timer-display" id="timer-seconds">0</div>
+                        <div class="timer-instruction">DRINK FOR THE SECONDS!</div>
+                    `;
+                    rerrollDoublesWithPenalty(nextRoller);
+                }, 3000);
+            } else {
+                showDrinkingTimers(results, nextRoller);
+            }
+        }
+
+        function showDrinkingTimers(results, nextRoller) {
+            const timerEl = document.getElementById('drinking-timer');
+
+            function endAllDrinks(bountyThief) {
+                timerEl.classList.remove('active');
+                timerEl.querySelector('.timer-content').innerHTML = `
+                    <div class="timer-player-name" id="timer-player-name">---</div>
+                    <div class="timer-display" id="timer-seconds">0</div>
+                    <div class="timer-instruction">SECONDS TO DRINK!</div>
+                `;
+                if (bountyThief) {
+                    currentThreeMan = bountyThief;
+                    showThreeManDrinkAnim(bountyThief, 0, 'YOU ARE THE THREE MAN!');
+                }
+                currentPlayerIndex = nextRoller;
+                updateHUD();
+                isRolling = false;
+                document.getElementById('rollBtn').disabled = false;
+                document.getElementById('rollBtn').textContent = "ROLL DICE";
+                document.getElementById('dice-distribution').style.display = 'none';
+                doublesMatchCycle = 0;
+            }
+
+            // Pre-process: apply immunity and bounty
+            let bountyThief = null;
+            const processed = results.map(({ player, seconds }) => {
+                if (gameplay.immunityRound && !immunityUsed && player === currentThreeMan) {
+                    immunityUsed = true;
+                    return { player, seconds, immune: true };
+                }
+                if (gameplay.bounty && player === currentThreeMan) {
+                    threeManDrinkCount++;
+                    if (threeManDrinkCount >= 5 && !bountyThief) {
+                        bountyThief = players[currentPlayerIndex];
+                        threeManDrinkCount = 0;
+                    }
+                }
+                return { player, seconds, immune: false };
+            });
+
+            const maxSeconds = Math.max(...processed.map(r => r.immune ? 0 : r.seconds));
+
+            // Build combined pop-up
+            const rowsHtml = processed.map(({ player, seconds, immune }) => `
+                <div style="text-align: center; padding: 10px 20px; border-bottom: 1px solid #1a1a1a;">
+                    <div style="font-size: clamp(0.75rem, 3.5vw, 1rem); color: #FF0000; margin-bottom: 6px;">${player}</div>
+                    ${immune
+                        ? `<div style="font-size: clamp(0.65rem, 3vw, 0.9rem); color: #FFFFFF;">IMMUNITY — NO DRINK</div>`
+                        : `<div style="font-size: clamp(1.8rem, 9vw, 3rem); color: #FFFFFF; line-height: 1;">${seconds}</div>
+                           <div style="font-size: clamp(0.4rem, 1.8vw, 0.55rem); color: #666; margin-top: 2px;">SECONDS TO DRINK</div>`
+                    }
+                </div>
+            `).join('');
+
+            let countdownHtml = '';
+            if (gameplay.drinkTimer && maxSeconds > 0) {
+                countdownHtml = `<div id="combined-countdown" style="font-size: clamp(0.5rem, 2vw, 0.65rem); color: #555; margin-top: 8px; text-align: center;">TIME LEFT: ${maxSeconds}s</div>`;
+            }
+
+            timerEl.querySelector('.timer-content').innerHTML = `
+                ${rowsHtml}
+                ${countdownHtml}
+                <div style="font-size: clamp(0.35rem, 1.6vw, 0.5rem); color: #333; text-align: center; padding: 14px 16px 4px; letter-spacing: 0.06em;">
+                    TAP ANYWHERE WHEN SIPS ARE DONE
+                </div>
+            `;
+
+            timerEl.classList.add('active');
+
+            let dismissed = false;
+            let autoTimer = null;
+            let countdownInterval = null;
+
+            function dismiss() {
+                if (dismissed) return;
+                dismissed = true;
+                if (autoTimer) clearTimeout(autoTimer);
+                if (countdownInterval) clearInterval(countdownInterval);
+                endAllDrinks(bountyThief);
+            }
+
+            timerEl.addEventListener('click', dismiss, { once: true });
+
+            if (maxSeconds > 0) {
+                autoTimer = setTimeout(dismiss, maxSeconds * 1000);
+
+                if (gameplay.drinkTimer) {
+                    let remaining = maxSeconds;
+                    countdownInterval = setInterval(() => {
+                        remaining--;
+                        const el = document.getElementById('combined-countdown');
+                        if (el) el.textContent = `TIME LEFT: ${remaining}s`;
+                        if (remaining <= 0) clearInterval(countdownInterval);
+                    }, 1000);
+                }
+            } else {
+                // All immune — dismiss quickly
+                autoTimer = setTimeout(dismiss, 1500);
+            }
+        }
+
+        function rerrollDoublesWithPenalty(nextRoller) {
+            const speedMult = diceSpeed === 'slow' ? 0.5 : diceSpeed === 'fast' ? 1.7 : 1.0;
+            diceArray.forEach((die, index) => {
+                const modifier = index === 0 ? -1 : 1;
+                die.body.position.set(modifier * 2 + (Math.random() - 0.5), 10 + Math.random() * 2, -3);
+                die.body.velocity.set(modifier * (Math.random() * 5) * speedMult, -10 * speedMult, Math.random() * 10 * speedMult);
+                die.body.angularVelocity.set(Math.random() * 20 * speedMult, Math.random() * 20 * speedMult, Math.random() * 20 * speedMult);
+            });
+            setTimeout(() => {
+                rollCheckInterval = setInterval(checkIfAsleepForPenaltyRoll, 100);
+            }, 500);
             window.penaltyRollActive = true;
             window.penaltyRoller = doublesRollData.rollerName;
             window.penaltyNextRoller = nextRoller;
@@ -2634,7 +2780,6 @@
             diceArray.forEach(die => {
                 if (die.body.velocity.lengthSquared() > 0.05 || die.body.angularVelocity.lengthSquared() > 0.05) { stopped = false; }
             });
-
             if (stopped) {
                 clearInterval(rollCheckInterval);
                 processPenaltyRollResults();
@@ -2645,43 +2790,97 @@
             const die1 = getDieResult(diceArray[0].mesh);
             const die2 = getDieResult(diceArray[1].mesh);
             const sum = die1 + die2;
-            const multiplier = doublesMatchCycle + 2; // matches showDrinkingTimers logic
-            const penaltySum = sum * multiplier;
             const rollerName = window.penaltyRoller;
+            const nextRoller = window.penaltyNextRoller;
+            window.penaltyRollActive = false;
 
+            // CYCLE: roller rolled doubles → escape, dice pass back to recipients
+            if (die1 === die2) {
+                doublesMatchCycle++;
+                const newMultiplier = doublesMatchCycle + 1;
+                const timerEl = document.getElementById('drinking-timer');
+                timerEl.querySelector('.timer-content').innerHTML = `
+                    <div style="font-size: 1.5rem; color: #FFFFFF; margin-bottom: 20px;">DOUBLES!</div>
+                    <div style="font-size: 1.2rem; color: #FF0000; margin-bottom: 30px;">${rollerName.toUpperCase()} ESCAPES!</div>
+                    <div style="font-size: 1rem; color: #FFFFFF; margin-bottom: 10px;">Dice return to recipients...</div>
+                    <div style="font-size: 0.9rem; color: #FF0000;">MULTIPLIER NOW: ${newMultiplier}×</div>
+                `;
+                timerEl.classList.add('active');
+                setTimeout(() => {
+                    timerEl.classList.remove('active');
+                    timerEl.querySelector('.timer-content').innerHTML = `
+                        <div class="timer-player-name" id="timer-player-name">---</div>
+                        <div class="timer-display" id="timer-seconds">0</div>
+                        <div class="timer-instruction">DRINK FOR THE SECONDS!</div>
+                    `;
+                    showRecipientRollPrompt();
+                }, 3000);
+                return;
+            }
+
+            // Non-doubles: roller drinks sum × multiplier
+            const multiplier = doublesMatchCycle + 1;
+            const penaltySum = sum * multiplier;
             const timerEl = document.getElementById('drinking-timer');
-            document.getElementById('timer-player-name').textContent = rollerName;
-            timerEl.querySelector('.timer-instruction').textContent = 'DRINK FOR THE SECONDS!';
 
             function endPenaltyTurn() {
                 timerEl.classList.remove('active');
-                currentPlayerIndex = window.penaltyNextRoller;
+                timerEl.querySelector('.timer-content').innerHTML = `
+                    <div class="timer-player-name" id="timer-player-name">---</div>
+                    <div class="timer-display" id="timer-seconds">0</div>
+                    <div class="timer-instruction">SECONDS TO DRINK!</div>
+                `;
+                currentPlayerIndex = nextRoller;
                 updateHUD();
                 isRolling = false;
                 document.getElementById('rollBtn').disabled = false;
                 document.getElementById('rollBtn').textContent = "ROLL DICE";
                 document.getElementById('dice-distribution').style.display = 'none';
-                window.penaltyRollActive = false;
+                doublesMatchCycle = 0;
             }
 
-            if (!gameplay.drinkTimer) {
-                document.getElementById('timer-seconds').textContent = 'DRINK!';
-                timerEl.classList.add('active');
-                setTimeout(endPenaltyTurn, 1500);
-                return;
-            }
+            let countdownHtml = gameplay.drinkTimer
+                ? `<div id="combined-countdown" style="font-size: clamp(0.5rem, 2vw, 0.65rem); color: #555; margin-top: 8px; text-align: center;">TIME LEFT: ${penaltySum}s</div>`
+                : '';
 
-            document.getElementById('timer-seconds').textContent = penaltySum;
+            timerEl.querySelector('.timer-content').innerHTML = `
+                <div style="text-align: center; padding: 10px 20px; border-bottom: 1px solid #1a1a1a;">
+                    <div style="font-size: clamp(0.75rem, 3.5vw, 1rem); color: #FF0000; margin-bottom: 6px;">${rollerName}</div>
+                    <div style="font-size: clamp(1.8rem, 9vw, 3rem); color: #FFFFFF; line-height: 1;">${penaltySum}</div>
+                    <div style="font-size: clamp(0.4rem, 1.8vw, 0.55rem); color: #666; margin-top: 2px;">SECONDS TO DRINK — ${sum} × ${multiplier} PENALTY</div>
+                </div>
+                ${countdownHtml}
+                <div style="font-size: clamp(0.35rem, 1.6vw, 0.5rem); color: #333; text-align: center; padding: 14px 16px 4px; letter-spacing: 0.06em;">
+                    TAP ANYWHERE WHEN SIPS ARE DONE
+                </div>
+            `;
+
             timerEl.classList.add('active');
-            let countdown = penaltySum;
-            const interval = setInterval(() => {
-                countdown--;
-                document.getElementById('timer-seconds').textContent = countdown;
-                if (countdown < 0) {
-                    clearInterval(interval);
-                    endPenaltyTurn();
-                }
-            }, 1000);
+
+            let dismissed = false;
+            let autoTimer = null;
+            let countdownInterval = null;
+
+            function dismissPenalty() {
+                if (dismissed) return;
+                dismissed = true;
+                if (autoTimer) clearTimeout(autoTimer);
+                if (countdownInterval) clearInterval(countdownInterval);
+                endPenaltyTurn();
+            }
+
+            timerEl.addEventListener('click', dismissPenalty, { once: true });
+            autoTimer = setTimeout(dismissPenalty, penaltySum * 1000);
+
+            if (gameplay.drinkTimer) {
+                let remaining = penaltySum;
+                countdownInterval = setInterval(() => {
+                    remaining--;
+                    const el = document.getElementById('combined-countdown');
+                    if (el) el.textContent = `TIME LEFT: ${remaining}s`;
+                    if (remaining <= 0) clearInterval(countdownInterval);
+                }, 1000);
+            }
         }
 
         // Dedicated function to handle the manual transfer of the title
@@ -2760,7 +2959,7 @@
 
         // Gameplay settings
         const gameplay = {
-            drinkTimer: true,
+            drinkTimer: false,
             doubleTrouble: false,
             chainReaction: false,
             hotPotato: false,
