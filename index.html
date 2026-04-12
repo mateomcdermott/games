@@ -2973,7 +2973,7 @@
             errorEl.textContent = '';
 
             // Only show player list if game is active (game-screen visible)
-            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            const gameActive = document.getElementById('game-screen').style.display === 'block';
             if (!gameActive) {
                 container.style.display = 'none';
                 document.getElementById('settings-player-list').previousElementSibling.style.display = 'none'; // section label
@@ -3047,7 +3047,7 @@
         }
 
         document.getElementById('settingsBtn').addEventListener('click', () => {
-            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            const gameActive = document.getElementById('game-screen').style.display === 'block';
             // Show/hide game-only options
             document.getElementById('settingsSkipBtn').style.display = gameActive ? '' : 'none';
             document.getElementById('settingsResetThreeManBtn').style.display = gameActive ? '' : 'none';
@@ -3069,7 +3069,7 @@
         });
 
         document.getElementById('settingsSkipBtn').addEventListener('click', () => {
-            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            const gameActive = document.getElementById('game-screen').style.display === 'block';
             if (!gameActive) return;
             currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
             nextRollerIndex = currentPlayerIndex;
@@ -3083,7 +3083,7 @@
         });
 
         document.getElementById('settingsResetThreeManBtn').addEventListener('click', () => {
-            const gameActive = document.getElementById('game-screen').style.display !== 'none';
+            const gameActive = document.getElementById('game-screen').style.display === 'block';
             if (!gameActive) return;
             currentThreeMan = null;
             updateHUD();
@@ -3266,6 +3266,105 @@
 
             nextFrame();
         })();
+
+        // ==========================================
+        // TEST API — exposes internals for Playwright tests
+        // ==========================================
+        window.__test = {
+            /** Jump straight into the game with known state, no physics init needed. */
+            initGame(playerNames, threeManName, currentIdx) {
+                players = playerNames;
+                currentThreeMan = threeManName || null;
+                currentPlayerIndex = (currentIdx != null) ? currentIdx : 0;
+                nextRollerIndex = currentPlayerIndex;
+                isRolling = false;
+                doublesMatchCycle = 0;
+                doublesRollData = {};
+                lastRollSum = null;
+                lastRoller = null;
+
+                // Mock diceArray with full structure so rollBtn click doesn't crash
+                diceArray = [
+                    {
+                        mesh: { quaternion: new THREE.Quaternion() },
+                        body: {
+                            position: { set() {} },
+                            velocity: { set() {}, lengthSquared() { return 0; } },
+                            angularVelocity: { set() {}, lengthSquared() { return 0; } }
+                        }
+                    },
+                    {
+                        mesh: { quaternion: new THREE.Quaternion() },
+                        body: {
+                            position: { set() {} },
+                            velocity: { set() {}, lengthSquared() { return 0; } },
+                            angularVelocity: { set() {}, lengthSquared() { return 0; } }
+                        }
+                    }
+                ];
+
+                // Reset all overlays/prompts
+                const overlay = document.getElementById('threeman-drink-overlay');
+                overlay.className = '';
+                overlay.innerHTML = '';
+                document.getElementById('drinking-timer').classList.remove('active');
+                document.getElementById('action-prompt').classList.remove('active');
+                document.getElementById('player-select-list').innerHTML = '';
+                document.getElementById('player-select-list').style.display = 'none';
+                document.getElementById('dice-distribution').style.display = 'none';
+                document.getElementById('dismissBtn').style.display = 'block';
+                document.getElementById('dismissBtn').textContent = 'GOT IT';
+                document.getElementById('rollBtn').disabled = false;
+                document.getElementById('rollBtn').textContent = 'ROLL DICE';
+
+                // Navigate to game screen
+                document.getElementById('intro-overlay').style.display = 'none';
+                document.getElementById('landing-page').style.display = 'none';
+                document.getElementById('wheel-screen').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'block';
+
+                updateHUD();
+            },
+
+            /** Simulate a roll with exact die values — bypasses physics. */
+            processRoll(die1, die2) {
+                // Reset prompt UI before rolling
+                document.getElementById('action-prompt').classList.remove('active');
+                document.getElementById('player-select-list').innerHTML = '';
+                document.getElementById('player-select-list').style.display = 'none';
+                document.getElementById('dice-distribution').style.display = 'none';
+                document.getElementById('dismissBtn').style.display = 'block';
+
+                const origGetDieResult = getDieResult;
+                let calls = 0;
+                getDieResult = function() { return calls++ === 0 ? die1 : die2; };
+                isRolling = true;
+                processRollResults();
+                getDieResult = origGetDieResult;
+            },
+
+            /** Read current game state. */
+            getState() {
+                return {
+                    players: [...players],
+                    currentPlayerIndex,
+                    currentThreeMan,
+                    nextRollerIndex,
+                };
+            },
+
+            /** Set a gameplay toggle key to true/false. */
+            setGameplay(key, value) {
+                gameplay[key] = value;
+            },
+
+            /** Immediately dismiss the Three Man drink overlay. */
+            dismissThreeManOverlay() {
+                const overlay = document.getElementById('threeman-drink-overlay');
+                overlay.className = '';
+                overlay.innerHTML = '';
+            }
+        };
     </script>
 </body>
 
